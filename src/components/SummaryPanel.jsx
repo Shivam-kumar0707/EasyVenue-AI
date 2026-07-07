@@ -4,19 +4,16 @@
  */
 import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2 } from 'lucide-react';
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase/config.js';
 import { summarizeActivity } from '../ai/summarizeActivity.js';
-import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 
 /**
  * SummaryPanel component lets organizers run an AI compilation of the last hour's events.
  * It filters active logs, skips AI calls when zero incidents exist, and renders bullet points.
  *
  * @param {Object} props
- * @param {Array} props.incidents - Full incident documents list (kept for signature compatibility).
+ * @param {Array} props.incidents - Full incident documents list.
  */
-export function SummaryPanel({ incidents: _incidents }) {
+export function SummaryPanel({ incidents }) {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,23 +24,11 @@ export function SummaryPanel({ incidents: _incidents }) {
     try {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-      // Fetch incidents reported in the last hour directly from Firestore
-      const incidentsCol = collection(db, 'incidents');
-      const hourlyIncidentsQuery = query(
-        incidentsCol,
-        where('reportedAt', '>=', Timestamp.fromDate(oneHourAgo))
-      );
-      const incidentsSnapshot = await getDocs(hourlyIncidentsQuery);
-      const recentIncidents = [];
-
-      incidentsSnapshot.forEach((docSnap) => {
-        const incidentFields = docSnap.data();
-        const reportedAtDate = parseFirestoreDate(incidentFields.reportedAt);
-        recentIncidents.push({
-          id: docSnap.id,
-          ...incidentFields,
-          reportedAt: reportedAtDate,
-        });
+      // Filter recent incidents in-memory from props
+      const recentIncidents = (incidents || []).filter((inc) => {
+        if (!inc.reportedAt) return false;
+        const reportedTime = inc.reportedAt instanceof Date ? inc.reportedAt : new Date(inc.reportedAt);
+        return reportedTime.getTime() >= oneHourAgo.getTime();
       });
 
       if (recentIncidents.length === 0) {

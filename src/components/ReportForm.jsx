@@ -2,7 +2,7 @@
  * @file ReportForm.jsx
  * @description Component for logging new operational incidents with live validation.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FileEdit, CheckCircle2, AlertCircle, Sparkles, Clock } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';
 
@@ -17,20 +17,26 @@ import { validateInput } from '../utils/validateInput.js';
  */
 export function ReportForm({ zones, onSubmitIncident }) {
   const [description, setDescription] = useState('');
-  const [charCount, setCharCount] = useState(0);
   const [selectedZone, setSelectedZone] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [cooldown, setCooldown] = useState(0);
 
-  // Debounce character counter update to 300ms
+  const cooldownIntervalRef = useRef(null);
+  const successTimerRef = useRef(null);
+
+  // Cleanup timers on unmount
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setCharCount(description.length);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [description]);
+    return () => {
+      if (cooldownIntervalRef.current) {
+        clearInterval(cooldownIntervalRef.current);
+      }
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
 
   // Set default selected zone when list loads
   useEffect(() => {
@@ -63,18 +69,29 @@ export function ReportForm({ zones, onSubmitIncident }) {
 
       // Trigger 5-second cooldown
       setCooldown(5);
-      const cooldownInterval = setInterval(() => {
+      if (cooldownIntervalRef.current) {
+        clearInterval(cooldownIntervalRef.current);
+      }
+      cooldownIntervalRef.current = setInterval(() => {
         setCooldown((prev) => {
           if (prev <= 1) {
-            clearInterval(cooldownInterval);
+            if (cooldownIntervalRef.current) {
+              clearInterval(cooldownIntervalRef.current);
+              cooldownIntervalRef.current = null;
+            }
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
 
-      const successTimer = setTimeout(() => setShowSuccess(false), 4000);
-      return () => clearTimeout(successTimer);
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current);
+      }
+      successTimerRef.current = setTimeout(() => {
+        setShowSuccess(false);
+        successTimerRef.current = null;
+      }, 4000);
     } catch (err) {
       const isValidationError =
         err.message &&
@@ -131,9 +148,9 @@ export function ReportForm({ zones, onSubmitIncident }) {
               Raw Description
             </label>
             <span
-              className={`text-[10px] font-bold ${charCount > 500 ? 'text-rose-500' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${description.length > 500 ? 'text-rose-500' : 'text-slate-500'}`}
             >
-              {charCount} / 500 characters
+              {description.length} / 500 characters
             </span>
           </div>
           <textarea

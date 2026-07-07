@@ -2,7 +2,7 @@
  * @file TrendSparkline.jsx
  * @description Component rendering historical crowd level SVG charts and accessible tooltips.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useId } from 'react';
 import { generateSparklinePath } from '../utils/generateSparklinePath.js';
 import { getTrendDescription } from '../utils/trendDesc.js';
 
@@ -18,6 +18,7 @@ import { getTrendDescription } from '../utils/trendDesc.js';
  */
 export function TrendSparkline({ zoneName, history, currentLevel }) {
   const [activePoint, setActivePoint] = useState(null);
+  const gradientId = useId();
 
   const width = 180;
   const height = 45;
@@ -99,7 +100,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
       >
         <defs>
           <linearGradient
-            id={`gradient-${zoneName.replace(/\s+/g, '')}`}
+            id={gradientId}
             x1="0"
             y1="0"
             x2="0"
@@ -115,7 +116,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
           <path
             d={areaPath}
             className={`${strokeColorClass} fill-current`}
-            style={{ fill: `url(#gradient-${zoneName.replace(/\s+/g, '')})` }}
+            style={{ fill: `url(#${gradientId})` }}
           />
         )}
 

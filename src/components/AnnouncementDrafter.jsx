@@ -17,7 +17,6 @@ import { validateInput } from '../utils/validateInput.js';
  */
 export function AnnouncementDrafter({ announcements, loading, onCreateAnnouncement }) {
   const [situation, setSituation] = useState('');
-  const [charCount, setCharCount] = useState(0);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [latestDraft, setLatestDraft] = useState(null);
@@ -33,14 +32,6 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
       }
     };
   }, []);
-
-  // Debounce character counter update to 300ms
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setCharCount(situation.length);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [situation]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,10 +117,10 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
             </label>
             <span
               id="char-count-ann"
-              className={`text-[10px] font-bold ${charCount > 300 ? 'text-rose-500' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${situation.length > 300 ? 'text-rose-500' : 'text-slate-500'}`}
               aria-live="polite"
             >
-              {charCount} / 300 characters
+              {situation.length} / 300 characters
             </span>
           </div>
           <textarea

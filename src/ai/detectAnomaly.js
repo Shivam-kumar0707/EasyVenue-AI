@@ -4,6 +4,10 @@
  */
 import { getGroqChatCompletion } from './groqClient.js';
 
+const anomalyCache = new Map();
+const CACHE_TTL_MS = 120000; // 2 minutes
+const FALLBACK_RECOMMENDATION = 'Deploy staff to monitor the zone and manage crowd flow.';
+
 /**
  * Generates a short, actionable recommendation for a zone experiencing a crowd level spike.
  * @param {string} zoneName - Name of the zone (e.g. Gate 1).
@@ -14,6 +18,16 @@ import { getGroqChatCompletion } from './groqClient.js';
 export async function detectAnomaly(zoneName, beforeValue, afterValue) {
   if (!zoneName || typeof beforeValue !== 'number' || typeof afterValue !== 'number') {
     throw new Error('Invalid parameters for anomaly detection.');
+  }
+
+  const cacheKey = `${zoneName}_${beforeValue}_${afterValue}`;
+  const now = Date.now();
+
+  if (anomalyCache.has(cacheKey)) {
+    const entry = anomalyCache.get(cacheKey);
+    if (now - entry.timestamp < CACHE_TTL_MS) {
+      return entry.result;
+    }
   }
 
   const systemPrompt = `You are a stadium crowd safety officer. A sudden crowd level spike was detected.
@@ -44,9 +58,12 @@ Rules:
       cleaned = words.slice(0, 15).join(' ');
     }
 
-    return cleaned || 'Deploy staff to monitor the zone and manage crowd flow.';
+    const result = cleaned || FALLBACK_RECOMMENDATION;
+    anomalyCache.set(cacheKey, { result, timestamp: now });
+    return result;
   } catch {
     console.error('Failed to get anomaly recommendation, applying fallback.');
-    return 'Deploy staff to monitor the zone and manage crowd flow.';
+    anomalyCache.set(cacheKey, { result: FALLBACK_RECOMMENDATION, timestamp: now });
+    return FALLBACK_RECOMMENDATION;
   }
 }

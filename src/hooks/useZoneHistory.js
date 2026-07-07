@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
+import { trimOldHistory } from '../utils/trimHistory.js';
 
 /**
  * Custom hook to listen to the history subcollection of a specific zone in Firestore.
@@ -43,7 +44,10 @@ export function useZoneHistory(zoneId) {
           });
         });
 
-        setHistory(historicalReadings);
+        const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+        const trimmedReadings = trimOldHistory(historicalReadings, thirtyMinutesAgo);
+
+        setHistory(trimmedReadings);
         setLoading(false);
       },
       (error) => {

@@ -4,6 +4,14 @@
  */
 import { getGroqChatCompletion } from './groqClient.js';
 
+const announcementCache = new Map();
+const CACHE_TTL_MS = 120000; // 2 minutes
+const FALLBACK_ANNOUNCEMENT = 'Could not draft announcement — please try again';
+
+function normalizeText(text) {
+  return text ? text.trim().toLowerCase().replace(/\s+/g, ' ') : '';
+}
+
 /**
  * Prompts Groq to draft a calm, clear, reassuring PA announcement based on a situation description.
  *
@@ -13,6 +21,16 @@ import { getGroqChatCompletion } from './groqClient.js';
 export async function draftAnnouncement(situation) {
   if (!situation || !situation.trim()) {
     throw new Error('Situation description cannot be empty.');
+  }
+
+  const normalized = normalizeText(situation);
+  const now = Date.now();
+
+  if (announcementCache.has(normalized)) {
+    const entry = announcementCache.get(normalized);
+    if (now - entry.timestamp < CACHE_TTL_MS) {
+      return entry.result;
+    }
   }
 
   const systemPrompt = `You are a professional stadium operations PA announcer.
@@ -33,9 +51,12 @@ Rules:
     const response = await getGroqChatCompletion(messages);
     const cleaned = response.trim().replace(/^["']|["']$/g, '');
 
-    return cleaned || 'Could not draft announcement — please try again';
+    const result = cleaned || FALLBACK_ANNOUNCEMENT;
+    announcementCache.set(normalized, { result, timestamp: now });
+    return result;
   } catch {
     console.error('Failed to draft announcement, applying fallback.');
-    return 'Could not draft announcement — please try again';
+    announcementCache.set(normalized, { result: FALLBACK_ANNOUNCEMENT, timestamp: now });
+    return FALLBACK_ANNOUNCEMENT;
   }
 }

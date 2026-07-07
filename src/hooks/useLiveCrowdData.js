@@ -7,9 +7,7 @@ import {
   collection,
   onSnapshot,
   doc,
-  updateDoc,
   Timestamp,
-  setDoc,
   query,
   where,
   getDocs,
@@ -39,6 +37,15 @@ export function useLiveCrowdData() {
   const lastAlertedRef = useRef({});
   // Ref to hold the latest zones list for the simulator loop
   const zonesRef = useRef([]);
+  // Track if component is currently mounted to prevent async rescheduling after unmount
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     zonesRef.current = zones;
@@ -141,13 +148,20 @@ export function useLiveCrowdData() {
       const currentZones = zonesRef.current;
       if (currentZones.length === 0) {
         // If zones aren't loaded yet, check again in 2 seconds
-        simulatorTimerId = setTimeout(tick, 2000);
+        if (isMountedRef.current) {
+          simulatorTimerId = setTimeout(tick, 2000);
+        }
         return;
       }
 
       // 10% chance of a surge (+25 to +35) on a random zone
       const isSurge = Math.random() < 0.1;
       const surgeZoneIndex = isSurge ? Math.floor(Math.random() * currentZones.length) : -1;
+
+      const batch = writeBatch(db);
+      let hasUpdates = false;
+      const currentTimestamp = Timestamp.now();
+      const updatedZoneIds = [];
 
       for (let zoneIndex = 0; zoneIndex < currentZones.length; zoneIndex++) {
         const currentZone = currentZones[zoneIndex];
@@ -172,25 +186,33 @@ export function useLiveCrowdData() {
         const updatedCrowdLevel = Math.max(0, Math.min(100, currentZone.crowdLevel + crowdChangeNudge));
 
         if (updatedCrowdLevel !== currentZone.crowdLevel) {
+          hasUpdates = true;
+          updatedZoneIds.push(currentZone.id);
           const targetZoneRef = doc(db, 'zones', currentZone.id);
-          try {
-            const currentTimestamp = Timestamp.now();
-            await updateDoc(targetZoneRef, {
-              crowdLevel: updatedCrowdLevel,
-              lastUpdated: currentTimestamp,
-            });
 
-            // Append to history subcollection: zones/{zoneId}/history/{timestamp}
-            const historyDocumentId = String(currentTimestamp.toMillis());
-            const zoneHistoryDocRef = doc(db, 'zones', currentZone.id, 'history', historyDocumentId);
-            await setDoc(zoneHistoryDocRef, {
-              crowdLevel: updatedCrowdLevel,
-              timestamp: currentTimestamp,
-            });
+          batch.update(targetZoneRef, {
+            crowdLevel: updatedCrowdLevel,
+            lastUpdated: currentTimestamp,
+          });
 
-            // Trim history older than 30 minutes (Efficiency)
-            const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-            const historyCol = collection(db, 'zones', currentZone.id, 'history');
+          // Append to history subcollection: zones/{zoneId}/history/{timestamp}
+          const historyDocumentId = String(currentTimestamp.toMillis());
+          const zoneHistoryDocRef = doc(db, 'zones', currentZone.id, 'history', historyDocumentId);
+          batch.set(zoneHistoryDocRef, {
+            crowdLevel: updatedCrowdLevel,
+            timestamp: currentTimestamp,
+          });
+        }
+      }
+
+      if (hasUpdates) {
+        try {
+          await batch.commit();
+
+          // Trim history older than 30 minutes (Efficiency)
+          const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+          for (const zoneId of updatedZoneIds) {
+            const historyCol = collection(db, 'zones', zoneId, 'history');
             const expiredHistoryQuery = query(
               historyCol,
               where('timestamp', '<', Timestamp.fromDate(thirtyMinutesAgo))
@@ -204,19 +226,23 @@ export function useLiveCrowdData() {
               });
               await deleteBatch.commit();
             }
-          } catch (error) {
-            console.error(`Failed to simulate update for ${currentZone.name}:`, error);
           }
+        } catch (error) {
+          console.error('Failed to commit simulation batch update:', error);
         }
       }
 
-      // Schedule next tick with dynamic 6-8s interval
-      const nextInterval = Math.floor(Math.random() * 2000) + 6000;
-      simulatorTimerId = setTimeout(tick, nextInterval);
+      // Schedule next tick with dynamic 6-8s interval if still mounted
+      if (isMountedRef.current) {
+        const nextInterval = Math.floor(Math.random() * 2000) + 6000;
+        simulatorTimerId = setTimeout(tick, nextInterval);
+      }
     };
 
     const firstInterval = Math.floor(Math.random() * 2000) + 6000;
-    simulatorTimerId = setTimeout(tick, firstInterval);
+    if (isMountedRef.current) {
+      simulatorTimerId = setTimeout(tick, firstInterval);
+    }
 
     return () => clearTimeout(simulatorTimerId);
   }, []);

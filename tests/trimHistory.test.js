@@ -1,3 +1,7 @@
+/**
+ * @file trimHistory.test.js
+ * @description Unit tests for pruning/filtering old historical crowd level database readings in trimHistory.js.
+ */
 import { describe, test, expect } from 'vitest';
 import { trimOldHistory } from '../src/utils/trimHistory.js';
 
