@@ -12,6 +12,10 @@ import { getGroqChatCompletion } from './groqClient.js';
  * @returns {Promise<string>} - Actionable recommendation (max 15 words).
  */
 export async function detectAnomaly(zoneName, beforeValue, afterValue) {
+  if (!zoneName || typeof beforeValue !== 'number' || typeof afterValue !== 'number') {
+    throw new Error('Invalid parameters for anomaly detection.');
+  }
+
   const systemPrompt = `You are a stadium crowd safety officer. A sudden crowd level spike was detected.
 Zone: ${zoneName}
 Crowd Level jumped from ${beforeValue}% to ${afterValue}%.

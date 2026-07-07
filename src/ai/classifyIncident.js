@@ -17,6 +17,10 @@ function normalizeText(text) {
  * @returns {Promise<{category: string, severity: string, summary: string}>}
  */
 export async function classifyIncident(rawText) {
+  if (!rawText || !rawText.trim()) {
+    throw new Error('Incident description cannot be empty.');
+  }
+
   const normalized = normalizeText(rawText);
   const now = Date.now();
 

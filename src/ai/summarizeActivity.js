@@ -10,8 +10,8 @@ import { getGroqChatCompletion } from './groqClient.js';
  * @returns {Promise<string>} - Markdown bullet points representing the summary.
  */
 export async function summarizeActivity(incidents) {
-  // If zero incidents exist, skip the Groq call entirely and return standard text directly.
-  if (!incidents || incidents.length === 0) {
+  // If zero incidents exist or parameter is invalid, skip the Groq call and return standard text.
+  if (!incidents || !Array.isArray(incidents) || incidents.length === 0) {
     return 'No incidents in the last hour. Operations normal.';
   }
 
