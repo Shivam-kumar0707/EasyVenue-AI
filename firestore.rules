@@ -16,27 +16,31 @@ service cloud.firestore {
       match /history/{docId} {
         allow read: if true;
         // Validate simulation ticks values
-        allow write: if request.resource.data.crowdLevel is number
-                     && request.resource.data.crowdLevel >= 0
-                     && request.resource.data.crowdLevel <= 100;
+        allow create, update: if request.resource.data.crowdLevel is number
+                              && request.resource.data.crowdLevel >= 0
+                              && request.resource.data.crowdLevel <= 100;
+        allow delete: if true;
       }
     }
     
     match /incidents/{incidentId} {
       allow read: if true;
-      // Enforce incident categories, severities, and text size constraints
-      allow write: if request.resource.data.category in ['Crowd Size', 'Medical', 'Safety', 'Infrastructure', 'Other']
-                   && request.resource.data.severity in ['Low', 'Medium', 'High']
-                   && request.resource.data.description is string
-                   && request.resource.data.description.size() <= 500;
+      // Enforce incident categories, severities, status, and rawText size constraints
+      allow create, update: if request.resource.data.category in ['crowd_control', 'medical', 'security', 'facility', 'lost_person', 'unclassified']
+                           && request.resource.data.severity in ['low', 'medium', 'high']
+                           && request.resource.data.rawText is string
+                           && request.resource.data.rawText.size() <= 500
+                           && request.resource.data.status in ['open', 'acknowledged', 'resolved'];
+      allow delete: if true;
     }
     
     match /announcements/{announcementId} {
       allow read: if true;
       // Enforce situation input size and text properties
-      allow write: if request.resource.data.situationInput is string
-                   && request.resource.data.situationInput.size() <= 300
-                   && request.resource.data.text is string;
+      allow create, update: if request.resource.data.situationInput is string
+                           && request.resource.data.situationInput.size() <= 300
+                           && request.resource.data.text is string;
+      allow delete: if true;
     }
     
   }
