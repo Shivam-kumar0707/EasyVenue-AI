@@ -1,12 +1,25 @@
 # EasyVenue AI
 
+## Problem Statement Coverage
+
+EasyVenue AI aligns directly with the core pillars of the FIFA World Cup 2026 GenAI Challenge:
+
+| Challenge Pillar | Specific App Feature / Implementation |
+| :--- | :--- |
+| **Crowd Management** | Live Crowd Heatmap visualizes real-time zone capacities and crowd levels. Custom, dependency-free SVG sparklines track 30-minute historical trends to spot rising congestion. |
+| **Operational Intelligence** | Custom AI incident classifier parses raw voice/text reports into structured categories and severities. The hourly activity summarizer compiles active incidents into concise operational bullet points. |
+| **Real-Time Decision Support** | Low-latency anomaly detection monitors history windows and flags surges (>30%). Immediately requests Groq AI to generate a hyper-targeted, 15-word actionable safety recommendation. |
+| **Security & Safety** | Organizer tools to instantly draft PA announcement scripts to de-escalate crowd surges or redirect flows using a calm, reassuring, AI-drafted message under 40 words. |
+
 ## Chosen Vertical
 
 Organizer / Venue Staff
 
 ## Approach & Logic
 
-EasyVenue AI is a single-screen real-time stadium operations dashboard designed specifically for venue staff, organizers, and emergency directors during major events (e.g. FIFA World Cup 2026). The central design principle is a **single shared live stadium state** stored in Firebase Firestore, serving as the single source of truth for both human operators and generative AI models.
+In strict accordance with the challenge guidelines, this application is designed for a single, focused persona: the **stadium organizer and venue staff operator**. This vertical was chosen because stadium operational control rooms have the most immediate and critical need for context-aware AI reasoning to parse noisy, multi-modal incidents and generate fast, safe crowd safety recommendations under pressure.
+
+EasyVenue AI implements a single-screen real-time operations dashboard utilizing a **single shared live stadium state** stored in Firebase Firestore. This serves as the single source of truth for both human operators and generative AI models.
 
 Instead of running separate siloed workflows, every AI assistant capability in EasyVenue AI reasons over this unified live state. For instance, when the simulation engine updates crowd levels, the live UI changes via Firestore snapshot listeners, the in-memory anomaly detector calculates spikes, and the hourly summarizer digests recent reports. This architecture ensures complete alignment across human staff, system rules, and GenAI models, preventing split-second communication gaps.
 
