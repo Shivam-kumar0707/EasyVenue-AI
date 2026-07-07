@@ -55,17 +55,18 @@ export function Dashboard() {
             </div>
 
             {/* Live Badges (Status visual markers) */}
-            <nav className="flex items-center gap-3" aria-label="System status">
-              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-slate-950/60 border border-slate-850 px-3.5 py-1.5 text-xs font-bold text-slate-400">
+            <nav className="flex items-center gap-2" aria-label="System status">
+              <div className="hidden md:flex items-center gap-1.5 rounded-full bg-slate-950/60 border border-slate-850 px-3 py-1.5 text-xs font-bold text-slate-400">
                 <span
                   className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"
                   aria-hidden="true"
                 />
                 <span>Simulated Live Data</span>
               </div>
-              <div className="flex items-center gap-1.5 rounded-full bg-slate-950/60 border border-slate-850 px-3.5 py-1.5 text-xs font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 rounded-full bg-slate-950/60 border border-slate-850 px-3 py-1.5 text-[10px] sm:text-xs font-bold text-slate-400">
                 <Radio className="h-3.5 w-3.5 text-indigo-400 animate-pulse" aria-hidden="true" />
-                <span>FIFA World Cup 2026</span>
+                <span className="sm:inline hidden">FIFA World Cup 2026</span>
+                <span className="sm:hidden inline">WC '26</span>
               </div>
             </nav>
           </div>
@@ -77,8 +78,26 @@ export function Dashboard() {
         {/* Dismissible Crowd Surge alert banner */}
         <AlertBanner alert={activeAlert} onDismiss={dismissAlert} />
 
-        {/* Responsive Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Mobile / Tablet Stacking Layout (hidden on desktop lg) */}
+        <div className="flex flex-col gap-6 lg:hidden">
+          <Heatmap zones={zones} loading={zonesLoading} />
+          <ReportForm zones={zones} onSubmitIncident={addIncident} />
+          <AnnouncementDrafter
+            announcements={announcements}
+            loading={announcementsLoading}
+            onCreateAnnouncement={createAnnouncement}
+          />
+          <IncidentFeed
+            incidents={incidents}
+            loading={incidentsLoading}
+            onAcknowledge={acknowledgeIncident}
+            onResolve={resolveIncident}
+          />
+          <SummaryPanel incidents={incidents} />
+        </div>
+
+        {/* Desktop Layout (lg and above) */}
+        <div className="hidden lg:grid lg:grid-cols-3 gap-6">
           {/* Main Column: Heatmap and AI Summary compilation */}
           <div className="lg:col-span-2 space-y-6">
             <Heatmap zones={zones} loading={zonesLoading} />

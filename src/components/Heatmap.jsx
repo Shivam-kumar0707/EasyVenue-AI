@@ -43,7 +43,7 @@ function ZoneCard({ zone }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-bold text-slate-100 text-sm tracking-wide">{zone.name}</h3>
-          <p className="mt-1 text-xs text-slate-400/90">
+          <p className="mt-1 text-[11px] sm:text-xs text-slate-400/90">
             Est. Crowd:{' '}
             <span className="font-semibold text-slate-200">{estOccupants.toLocaleString()}</span> /{' '}
             {zone.capacity.toLocaleString()}
@@ -123,16 +123,16 @@ export function Heatmap({ zones, loading }) {
         </div>
 
         {/* Color Legend (Accessibility: Pairing colors with explicit text) */}
-        <div className="flex flex-wrap gap-4 text-xs font-semibold">
-          <div className="flex items-center gap-2 text-emerald-400 bg-emerald-500/5 px-3 py-1.5 rounded-full border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.05)]">
+        <div className="flex flex-wrap gap-2 sm:gap-4 text-[11px] sm:text-xs font-semibold">
+          <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/5 px-2.5 py-1 rounded-full border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.05)]">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>Low (&lt;50%)</span>
           </div>
-          <div className="flex items-center gap-2 text-amber-400 bg-amber-500/5 px-3 py-1.5 rounded-full border border-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.05)]">
+          <div className="flex items-center gap-1.5 text-amber-400 bg-amber-500/5 px-2.5 py-1 rounded-full border border-amber-500/20 shadow-[0_0_8px_rgba(245,158,11,0.05)]">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
             <span>Moderate (50-75%)</span>
           </div>
-          <div className="flex items-center gap-2 text-rose-400 bg-rose-500/5 px-3 py-1.5 rounded-full border border-rose-500/20 shadow-[0_0_8px_rgba(244,63,94,0.05)]">
+          <div className="flex items-center gap-1.5 text-rose-400 bg-rose-500/5 px-2.5 py-1 rounded-full border border-rose-500/20 shadow-[0_0_8px_rgba(244,63,94,0.05)]">
             <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
             <span>Critical (&gt;75%)</span>
           </div>
