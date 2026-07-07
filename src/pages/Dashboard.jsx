@@ -57,7 +57,7 @@ export function Dashboard() {
                   className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"
                   aria-hidden="true"
                 />
-                <span>IoT Crowd Sensors Active</span>
+                <span>Simulated Live Data</span>
               </div>
               <div className="flex items-center gap-1.5 rounded-full bg-slate-950/60 border border-slate-850 px-3.5 py-1.5 text-xs font-bold text-slate-400">
                 <Radio className="h-3.5 w-3.5 text-indigo-400 animate-pulse" aria-hidden="true" />

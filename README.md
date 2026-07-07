@@ -24,7 +24,7 @@ By utilising a low-latency, real-time database coupled with event-driven Groq SD
 - **Accessibility**: Built with semantic HTML elements (`header`, `nav`, `main`, `footer`, `section`, `article`). All buttons have descriptive `aria-label` fields detailing their exact action and location. Color choices (emerald, amber, rose) are paired with visible status text so meaning is never conveyed through color alone.
 
 ## Assumptions
-Real IoT turnstiles, crowd-density CCTV feeds, and ticket scanners are not available in this evaluation environment. Therefore, crowd level data is simulated via a randomized simulator loop in the client to represent live sensor feeds and demonstrate how the AI reasoning layer responds to surges. In production, this would subscribe to actual physical APIs or event-bus webhooks from ticketing gates and ticketing APIs.
+Real IoT turnstiles, crowd-density CCTV feeds, and ticket scanners are not available in this evaluation environment. Therefore, crowd level data is simulated via a randomized simulator loop in the client to represent simulated live feeds and demonstrate how the AI reasoning layer responds to surges. In production, this would subscribe to actual physical APIs or event-bus webhooks from ticketing gates and ticketing APIs.
 
 ## Setup
 1. Clone or download the repository files.
