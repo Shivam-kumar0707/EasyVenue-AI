@@ -45,8 +45,8 @@ Rules:
         : 'Needs manual review';
 
     return { category, severity, summary };
-  } catch (error) {
-    console.error('Failed to classify incident, applying fallback.', error);
+  } catch {
+    console.error('Failed to classify incident, applying fallback.');
     return {
       category: 'unclassified',
       severity: 'medium',

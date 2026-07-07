@@ -37,8 +37,8 @@ Rules:
     }
 
     return cleaned || 'Deploy staff to monitor the zone and manage crowd flow.';
-  } catch (error) {
-    console.error('Failed to get anomaly recommendation, applying fallback.', error);
+  } catch {
+    console.error('Failed to get anomaly recommendation, applying fallback.');
     return 'Deploy staff to monitor the zone and manage crowd flow.';
   }
 }

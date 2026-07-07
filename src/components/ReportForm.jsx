@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileEdit, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { FileEdit, CheckCircle2, AlertCircle, Sparkles, Clock } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';
 
 /**
@@ -17,6 +17,7 @@ export function ReportForm({ zones, onSubmitIncident }) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
   // Set default selected zone when list loads
   useEffect(() => {
@@ -47,10 +48,30 @@ export function ReportForm({ zones, onSubmitIncident }) {
       setDescription('');
       setShowSuccess(true);
 
+      // Trigger 5-second cooldown
+      setCooldown(5);
+      const cooldownInterval = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(cooldownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
       const successTimer = setTimeout(() => setShowSuccess(false), 4000);
       return () => clearTimeout(successTimer);
     } catch (err) {
-      setError(err.message || 'An error occurred during submission.');
+      const isValidationError =
+        err.message &&
+        (err.message.includes('cannot be empty') ||
+          err.message.includes('cannot exceed') ||
+          err.message.includes('Input must be a string') ||
+          err.message.includes('not allowed') ||
+          err.message.includes('select a valid'));
+      setError(isValidationError ? err.message : 'Something went wrong, please try again.');
+      console.error('Error logging incident');
     } finally {
       setIsSubmitting(false);
     }
@@ -132,13 +153,18 @@ export function ReportForm({ zones, onSubmitIncident }) {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || cooldown > 0}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-650 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition-all duration-200 hover:bg-indigo-500 hover:shadow-indigo-650/40 active:scale-[0.98] active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
         >
           {isSubmitting ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               <span>Analyzing with AI...</span>
+            </>
+          ) : cooldown > 0 ? (
+            <>
+              <Clock className="h-4 w-4 text-slate-400 animate-pulse" aria-hidden="true" />
+              <span>Cooldown: {cooldown}s</span>
             </>
           ) : (
             <>

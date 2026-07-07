@@ -1,9 +1,31 @@
 /**
- * Validates the raw incident description input.
- * Trims whitespace, rejects empty input, and enforces a 500-character limit.
- * @param {string} text - The raw text input to validate.
- * @returns {string} - The trimmed and validated text.
- * @throws {Error} - Standard error with descriptive message.
+ * Safely sanitizes user text to prevent basic XSS by stripping HTML tags and escaping special characters.
+ *
+ * @param {string} text - The raw input text.
+ * @returns {string} - Sanitized/escaped text.
+ */
+export function sanitizeInput(text) {
+  if (!text) return '';
+  // Strip HTML/Script tags using regex
+  const stripped = text.replace(/<[^>]*>/g, '');
+  // Escape key HTML control characters
+  return stripped
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
+/**
+ * Validates the raw input description.
+ * Trims whitespace, rejects empty input, enforces limits, rejects suspicious XSS vectors,
+ * and returns the sanitized/escaped safe text.
+ *
+ * @param {string} text - The raw text input.
+ * @returns {string} - The sanitized and validated text.
+ * @throws {Error} - Rejection message.
  */
 export function validateInput(text) {
   if (text === undefined || text === null) {
@@ -24,5 +46,10 @@ export function validateInput(text) {
     throw new Error('Incident description cannot exceed 500 characters.');
   }
 
-  return trimmed;
+  // Reject explicitly malicious script contexts
+  if (/<script|javascript:|onerror=|onload=/i.test(trimmed)) {
+    throw new Error('Suspicious characters or HTML tags are not allowed.');
+  }
+
+  return sanitizeInput(trimmed);
 }

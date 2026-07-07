@@ -30,4 +30,19 @@ describe('validateInput utility tests', () => {
     const maxLengthText = 'A'.repeat(500);
     expect(validateInput(maxLengthText)).toBe(maxLengthText);
   });
+
+  test('rejects suspicious script elements to prevent XSS execution', () => {
+    expect(() => validateInput('<script>alert("xss")</script>')).toThrow(
+      'Suspicious characters or HTML tags are not allowed.'
+    );
+    expect(() => validateInput('Check out javascript:evil()')).toThrow(
+      'Suspicious characters or HTML tags are not allowed.'
+    );
+  });
+
+  test('strips HTML elements and escapes control characters', () => {
+    const dirtyText = '<p>Spill near section & "3" </p>';
+    const cleaned = validateInput(dirtyText);
+    expect(cleaned).toBe('Spill near section &amp; &quot;3&quot; ');
+  });
 });

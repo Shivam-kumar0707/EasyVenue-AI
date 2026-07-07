@@ -45,8 +45,8 @@ Rules:
     }
 
     return cleaned;
-  } catch (error) {
-    console.error('Failed to summarize stadium activity, applying fallback.', error);
+  } catch {
+    console.error('Failed to summarize stadium activity, applying fallback.');
     return `- Operations team actively responding to ${incidents.length} logged incidents.\n- Security and facility staff deployed to zones with open issues.\n- Crowd dynamics and gate operations remain under close monitoring.`;
   }
 }

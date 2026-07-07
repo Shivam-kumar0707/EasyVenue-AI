@@ -1,5 +1,6 @@
 import { Groq } from 'groq-sdk';
 
+// This key is exposed client-side because this is a static frontend demo without a backend proxy. In production, this call should be routed through a backend/serverless function to keep the API key server-side and never exposed to the browser.
 const apiKey = import.meta.env.VITE_GROQ_API_KEY;
 
 if (!apiKey) {

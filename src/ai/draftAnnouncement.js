@@ -30,8 +30,8 @@ Rules:
     const cleaned = response.trim().replace(/^["']|["']$/g, '');
 
     return cleaned || 'Could not draft announcement — please try again';
-  } catch (error) {
-    console.error('Failed to draft announcement, applying fallback.', error);
+  } catch {
+    console.error('Failed to draft announcement, applying fallback.');
     return 'Could not draft announcement — please try again';
   }
 }
