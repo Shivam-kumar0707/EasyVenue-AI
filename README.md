@@ -4,12 +4,12 @@
 
 EasyVenue AI aligns directly with the core pillars of the FIFA World Cup 2026 GenAI Challenge:
 
-| Challenge Pillar | Specific App Feature / Implementation |
-| :--- | :--- |
-| **Crowd Management** | Live Crowd Heatmap visualizes real-time zone capacities and crowd levels. Custom, dependency-free SVG sparklines track 30-minute historical trends to spot rising congestion. |
-| **Operational Intelligence** | Custom AI incident classifier parses raw voice/text reports into structured categories and severities. The hourly activity summarizer compiles active incidents into concise operational bullet points. |
-| **Real-Time Decision Support** | Low-latency anomaly detection monitors history windows and flags surges (>30%). Immediately requests Groq AI to generate a hyper-targeted, 15-word actionable safety recommendation. |
-| **Security & Safety** | Organizer tools to instantly draft PA announcement scripts to de-escalate crowd surges or redirect flows using a calm, reassuring, AI-drafted message under 40 words. |
+| Challenge Pillar               | Specific App Feature / Implementation                                                                                                                                                                   |
+| :----------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Crowd Management**           | Live Crowd Heatmap visualizes real-time zone capacities and crowd levels. Custom, dependency-free SVG sparklines track 30-minute historical trends to spot rising congestion.                           |
+| **Operational Intelligence**   | Custom AI incident classifier parses raw voice/text reports into structured categories and severities. The hourly activity summarizer compiles active incidents into concise operational bullet points. |
+| **Real-Time Decision Support** | Low-latency anomaly detection monitors history windows and flags surges (>30%). Immediately requests Groq AI to generate a hyper-targeted, 15-word actionable safety recommendation.                    |
+| **Security & Safety**          | Organizer tools to instantly draft PA announcement scripts to de-escalate crowd surges or redirect flows using a calm, reassuring, AI-drafted message under 40 words.                                   |
 
 ## Chosen Vertical
 
@@ -61,6 +61,7 @@ Real IoT turnstiles, crowd-density CCTV feeds, and ticket scanners are not avail
 5. Run `npm test` to run the Vitest automated test suite.
 
 ## Bundle Size & Dependency Audit (Section 4)
+
 - **Production Dependencies**: Firebase, Groq-SDK, Lucide-React, React, React-Dom (all confirmed in active use).
 - **Dev Dependencies Only**: TailwindCSS, ESLint, Oxlint, Prettier, Vite, Vitest. (Verified that no dev tools are in production dependencies).
 - **Exact Output Build Size**:
@@ -68,4 +69,3 @@ Real IoT turnstiles, crowd-density CCTV feeds, and ticket scanners are not avail
   - `dist/assets/index-O57AzRDQ.css`: `45.99 kB`
   - `dist/assets/index-jM2ssO5m.js`: `753.37 kB`
   - **Total Production Build Size**: `~799.8 kB`
-

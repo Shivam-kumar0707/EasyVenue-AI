@@ -51,8 +51,8 @@ export const ZoneCard = React.memo(
             <h3 className="font-bold text-slate-100 text-sm tracking-wide">{zone.name}</h3>
             <p className="mt-1 text-[11px] sm:text-xs text-slate-400/90">
               Est. Crowd:{' '}
-              <span className="font-semibold text-slate-200">{estOccupants.toLocaleString()}</span> /{' '}
-              {zone.capacity.toLocaleString()}
+              <span className="font-semibold text-slate-200">{estOccupants.toLocaleString()}</span>{' '}
+              / {zone.capacity.toLocaleString()}
             </p>
           </div>
           <div className="flex flex-col items-end">

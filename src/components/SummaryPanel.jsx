@@ -27,7 +27,8 @@ export function SummaryPanel({ incidents }) {
       // Filter recent incidents in-memory from props
       const recentIncidents = (incidents || []).filter((inc) => {
         if (!inc.reportedAt) return false;
-        const reportedTime = inc.reportedAt instanceof Date ? inc.reportedAt : new Date(inc.reportedAt);
+        const reportedTime =
+          inc.reportedAt instanceof Date ? inc.reportedAt : new Date(inc.reportedAt);
         return reportedTime.getTime() >= oneHourAgo.getTime();
       });
 

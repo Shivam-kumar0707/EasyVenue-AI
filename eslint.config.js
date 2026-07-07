@@ -18,12 +18,12 @@ export default [
         clearInterval: 'readonly',
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
-        
+
         // Node / build process globals
         process: 'readonly',
         module: 'readonly',
         require: 'readonly',
-        
+
         // Vite / Env globals
         import: 'readonly',
 

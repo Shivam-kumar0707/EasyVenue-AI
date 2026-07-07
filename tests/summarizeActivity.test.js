@@ -29,7 +29,12 @@ describe('summarizeActivity AI utility tests', () => {
 
     const mockIncidents = [
       { zone: 'Gate 2', category: 'Crowd Size', severity: 'High', summary: 'Congestion' },
-      { zone: 'Concourse B', category: 'Infrastructure', severity: 'Medium', summary: 'Liquid spill' }
+      {
+        zone: 'Concourse B',
+        category: 'Infrastructure',
+        severity: 'Medium',
+        summary: 'Liquid spill',
+      },
     ];
 
     const result = await summarizeActivity(mockIncidents);
@@ -39,10 +44,12 @@ describe('summarizeActivity AI utility tests', () => {
   });
 
   test('returns fallback bulletin board message when Groq API call fails', async () => {
-    vi.mocked(groqClient.getGroqChatCompletion).mockRejectedValueOnce(new Error('Rate limit exceeded'));
+    vi.mocked(groqClient.getGroqChatCompletion).mockRejectedValueOnce(
+      new Error('Rate limit exceeded')
+    );
 
     const mockIncidents = [
-      { zone: 'Gate 2', category: 'Crowd Size', severity: 'High', summary: 'Congestion' }
+      { zone: 'Gate 2', category: 'Crowd Size', severity: 'High', summary: 'Congestion' },
     ];
 
     const result = await summarizeActivity(mockIncidents);

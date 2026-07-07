@@ -183,7 +183,10 @@ export function useLiveCrowdData() {
           }
         }
 
-        const updatedCrowdLevel = Math.max(0, Math.min(100, currentZone.crowdLevel + crowdChangeNudge));
+        const updatedCrowdLevel = Math.max(
+          0,
+          Math.min(100, currentZone.crowdLevel + crowdChangeNudge)
+        );
 
         if (updatedCrowdLevel !== currentZone.crowdLevel) {
           hasUpdates = true;

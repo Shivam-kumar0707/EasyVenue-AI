@@ -99,13 +99,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
         tabIndex="0"
       >
         <defs>
-          <linearGradient
-            id={gradientId}
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="1"
-          >
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.0" />
           </linearGradient>
