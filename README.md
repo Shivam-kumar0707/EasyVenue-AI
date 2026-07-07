@@ -40,6 +40,7 @@ By utilising a low-latency, real-time database coupled with event-driven Groq SD
 - **Security**:
   - **Firestore Security Rules**: Configured inside [firestore.rules](file:///d:/Prompt%20Wars%20Challenge%20-%204/firestore.rules) to check incoming document structures. Enforces category enums, severity levels, input lengths, and data types (blocking database bypass attempts).
   - **XSS Prevention & Sanitization**: Free-text inputs are sanitized in [validateInput.js](file:///d:/Prompt%20Wars%20Challenge%20-%204/src/utils/validateInput.js) (stripping HTML tags, escaping special characters, and rejecting suspicious script tags/inline event handlers) to prevent cross-site scripting.
+  - **Content Security Policy (CSP)**: Configured a strict CSP meta tag in `index.html` restricting script execution to self and authorized external CDNs to prevent malicious script execution.
   - **Client-Side Rate Limiting**: Added a 5-second submission cooldown timer (with countdown buttons) on both incident logs and PA announcement drafts to prevent API request spam.
   - **Honest API Key Exposure Disclosure**: Explicitly documented in [groqClient.js](file:///d:/Prompt%20Wars%20Challenge%20-%204/src/ai/groqClient.js) that client-side API key usage is a known static frontend architecture limitation, and recommended serverless proxy routing for production.
   - **Credential Isolation**: Utilizes `.env` configurations to keep credentials untracked in source control.

@@ -122,6 +122,7 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
             value={situation}
             onChange={(e) => setSituation(e.target.value)}
             disabled={isSubmitting}
+            maxLength="300"
             aria-describedby="char-count-ann"
             placeholder="E.g., 'Gate 2 is heavily congested, redirect incoming ticket holders to Gate 3.'"
             className="mt-1.5 block w-full rounded-lg border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-650 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 resize-none"

@@ -142,6 +142,7 @@ export function ReportForm({ zones, onSubmitIncident }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={isSubmitting}
+            maxLength="500"
             placeholder="E.g., 'A liquid spill is creating a slick surface in front of concession booth B' or 'Large group blockading the entrance corridor.'"
             className="mt-1.5 block w-full rounded-lg border border-slate-800 bg-slate-950 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 resize-none"
           />

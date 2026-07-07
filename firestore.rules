@@ -23,6 +23,7 @@ service cloud.firestore {
       allow create, update: if request.resource.data.category in ['crowd_control', 'medical', 'security', 'facility', 'lost_person', 'unclassified', 'Crowd Size', 'Medical', 'Safety', 'Infrastructure', 'Other']
                            && request.resource.data.severity in ['low', 'medium', 'high', 'Low', 'Medium', 'High']
                            && request.resource.data.status in ['open', 'acknowledged', 'resolved', 'Open', 'Acknowledged', 'Resolved']
+                           && request.resource.data.zone in ['Gate 1', 'Gate 2', 'Gate 3', 'Food Court', 'Main Concourse']
                            && (!('rawText' in request.resource.data) || (request.resource.data.rawText is string && request.resource.data.rawText.size() <= 500))
                            && (!('description' in request.resource.data) || (request.resource.data.description is string && request.resource.data.description.size() <= 500));
       allow delete: if true;
