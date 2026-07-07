@@ -8,6 +8,8 @@ import { Heatmap } from '../components/Heatmap.jsx';
 import { ReportForm } from '../components/ReportForm.jsx';
 import { IncidentFeed } from '../components/IncidentFeed.jsx';
 import { SummaryPanel } from '../components/SummaryPanel.jsx';
+import { AnnouncementDrafter } from '../components/AnnouncementDrafter.jsx';
+import { useAnnouncements } from '../hooks/useAnnouncements.js';
 
 /**
  * EasyVenue AI Organizer & Venue Staff Dashboard Page.
@@ -28,6 +30,8 @@ export function Dashboard() {
     acknowledgeIncident,
     resolveIncident,
   } = useIncidents();
+
+  const { announcements, loading: announcementsLoading, createAnnouncement } = useAnnouncements();
 
   return (
     <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans selection:bg-indigo-550 selection:text-white antialiased">
@@ -84,6 +88,11 @@ export function Dashboard() {
           {/* Sidebar Column: Log Incident & Incident Feed */}
           <div className="space-y-6">
             <ReportForm zones={zones} onSubmitIncident={addIncident} />
+            <AnnouncementDrafter
+              announcements={announcements}
+              loading={announcementsLoading}
+              onCreateAnnouncement={createAnnouncement}
+            />
             <IncidentFeed
               incidents={incidents}
               loading={incidentsLoading}
