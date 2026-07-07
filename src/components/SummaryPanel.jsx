@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2 } from 'lucide-react';
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase/config.js';
 import { summarizeActivity } from '../ai/summarizeActivity.js';
 
 /**
@@ -7,7 +9,7 @@ import { summarizeActivity } from '../ai/summarizeActivity.js';
  * It filters active logs, skips AI calls when zero incidents exist, and renders bullet points.
  *
  * @param {Object} props
- * @param {Array} props.incidents - Full incident documents list.
+ * @param {Array} props.incidents - Full incident documents list (kept for signature compatibility).
  */
 export function SummaryPanel({ incidents }) {
   const [summary, setSummary] = useState('');
@@ -18,13 +20,30 @@ export function SummaryPanel({ incidents }) {
     setSummary('');
 
     try {
-      const now = Date.now();
-      const oneHourAgo = now - 60 * 60 * 1000;
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-      // Filter incidents reported in the last 60 minutes
-      const lastHourIncidents = incidents.filter((inc) => {
-        const date = inc.reportedAt ? new Date(inc.reportedAt) : new Date(0);
-        return date.getTime() >= oneHourAgo;
+      // Fetch incidents reported in the last hour directly from Firestore
+      const incidentsCol = collection(db, 'incidents');
+      const q = query(
+        incidentsCol,
+        where('reportedAt', '>=', Timestamp.fromDate(oneHourAgo))
+      );
+      const querySnapshot = await getDocs(q);
+      const lastHourIncidents = [];
+
+      querySnapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        let reportedAtDate = new Date();
+        if (item.reportedAt) {
+          reportedAtDate = item.reportedAt.toDate
+            ? item.reportedAt.toDate()
+            : new Date(item.reportedAt);
+        }
+        lastHourIncidents.push({
+          id: docSnap.id,
+          ...item,
+          reportedAt: reportedAtDate,
+        });
       });
 
       if (lastHourIncidents.length === 0) {
