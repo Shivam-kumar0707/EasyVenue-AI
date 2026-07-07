@@ -1,5 +1,16 @@
 import { useEffect, useState, useRef } from 'react';
-import { collection, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  Timestamp,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  writeBatch,
+} from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 import { detectAnomaly } from '../ai/detectAnomaly.js';
 import { checkAnomaly } from '../utils/checkAnomaly.js';
@@ -161,10 +172,36 @@ export function useLiveCrowdData() {
         if (newLevel !== zone.crowdLevel) {
           const zoneRef = doc(db, 'zones', zone.id);
           try {
+            const timestampVal = Timestamp.now();
             await updateDoc(zoneRef, {
               crowdLevel: newLevel,
-              lastUpdated: Timestamp.now(),
+              lastUpdated: timestampVal,
             });
+
+            // Append to history subcollection: zones/{zoneId}/history/{timestamp}
+            const docId = String(timestampVal.toMillis());
+            const historyDocRef = doc(db, 'zones', zone.id, 'history', docId);
+            await setDoc(historyDocRef, {
+              crowdLevel: newLevel,
+              timestamp: timestampVal,
+            });
+
+            // Trim history older than 30 minutes (Efficiency)
+            const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+            const historyCol = collection(db, 'zones', zone.id, 'history');
+            const q = query(
+              historyCol,
+              where('timestamp', '<', Timestamp.fromDate(thirtyMinutesAgo))
+            );
+            const oldDocsSnapshot = await getDocs(q);
+
+            if (!oldDocsSnapshot.empty) {
+              const deleteBatch = writeBatch(db);
+              oldDocsSnapshot.forEach((oldDoc) => {
+                deleteBatch.delete(oldDoc.ref);
+              });
+              await deleteBatch.commit();
+            }
           } catch (error) {
             console.error(`Failed to simulate update for ${zone.name}:`, error);
           }

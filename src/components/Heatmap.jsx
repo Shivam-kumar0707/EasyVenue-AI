@@ -1,5 +1,83 @@
 import React from 'react';
 import { Users, AlertTriangle } from 'lucide-react';
+import { useZoneHistory } from '../hooks/useZoneHistory.js';
+import { TrendSparkline } from './TrendSparkline.jsx';
+
+/**
+ * Sub-component to render an individual Zone Card.
+ * Invokes the useZoneHistory hook to load real-time trend data.
+ *
+ * @param {Object} props
+ * @param {Object} props.zone - Stadium zone object.
+ */
+function ZoneCard({ zone }) {
+  const { history } = useZoneHistory(zone.id);
+
+  const level = zone.crowdLevel;
+  let themeClasses = '';
+  let barBg = '';
+  let flowText = '';
+
+  if (level < 50) {
+    themeClasses = 'border-emerald-500/20 bg-emerald-950/10 text-emerald-400';
+    barBg = 'bg-emerald-500';
+    flowText = 'Low / Normal Flow';
+  } else if (level <= 75) {
+    themeClasses = 'border-amber-500/20 bg-amber-950/10 text-amber-400';
+    barBg = 'bg-amber-500';
+    flowText = 'Moderate / Heavy Flow';
+  } else {
+    themeClasses = 'border-rose-500/20 bg-rose-950/10 text-rose-400';
+    barBg = 'bg-rose-500';
+    flowText = 'Critical / Surge Risk';
+  }
+
+  // Calculate occupants estimated based on percentage of max capacity
+  const estOccupants = Math.round((level / 100) * zone.capacity);
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:scale-[1.01] hover:shadow-md ${themeClasses}`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="font-semibold text-slate-100 text-sm tracking-wide">{zone.name}</h3>
+          <p className="mt-1 text-xs text-slate-400">
+            Est. Crowd:{' '}
+            <span className="font-semibold text-slate-200">{estOccupants.toLocaleString()}</span> /{' '}
+            {zone.capacity.toLocaleString()}
+          </p>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-xl font-extrabold tracking-tight">{level}%</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+            {flowText.split(' / ')[0]}
+          </span>
+        </div>
+      </div>
+
+      {/* Progress Bar Container */}
+      <div className="mt-4 h-2 w-full rounded-full bg-slate-950/40 overflow-hidden border border-slate-800">
+        <div
+          className={`h-full rounded-full ${barBg} transition-all duration-1000 ease-in-out`}
+          style={{ width: `${level}%` }}
+        />
+      </div>
+
+      {/* Interactive historical sparkline */}
+      <TrendSparkline zoneName={zone.name} history={history} currentLevel={level} />
+
+      <div className="mt-3 flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-850/30 pt-2.5">
+        <span>Updated {zone.lastUpdated.toLocaleTimeString()}</span>
+        {level > 75 && (
+          <span className="flex items-center gap-1 text-rose-400 font-bold animate-pulse">
+            <AlertTriangle className="h-3.5 w-3.5" /> High Risk
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 /**
  * Heatmap component renders a grid of zone cards.
@@ -23,7 +101,7 @@ export function Heatmap({ zones, loading }) {
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="h-32 animate-pulse rounded-xl bg-slate-800/40 border border-slate-800"
+              className="h-36 animate-pulse rounded-xl bg-slate-800/40 border border-slate-800"
             />
           ))}
         </div>
@@ -57,74 +135,9 @@ export function Heatmap({ zones, loading }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {zones.map((zone) => {
-          const level = zone.crowdLevel;
-          let themeClasses = '';
-          let barBg = '';
-          let flowText = '';
-
-          if (level < 50) {
-            themeClasses = 'border-emerald-500/20 bg-emerald-950/10 text-emerald-400';
-            barBg = 'bg-emerald-500';
-            flowText = 'Low / Normal Flow';
-          } else if (level <= 75) {
-            themeClasses = 'border-amber-500/20 bg-amber-950/10 text-amber-400';
-            barBg = 'bg-amber-500';
-            flowText = 'Moderate / Heavy Flow';
-          } else {
-            themeClasses = 'border-rose-500/20 bg-rose-950/10 text-rose-400';
-            barBg = 'bg-rose-500';
-            flowText = 'Critical / Surge Risk';
-          }
-
-          // Calculate occupants estimated based on percentage of max capacity
-          const estOccupants = Math.round((level / 100) * zone.capacity);
-
-          return (
-            <div
-              key={zone.id}
-              className={`relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:scale-[1.01] hover:shadow-md ${themeClasses}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="font-semibold text-slate-100 text-sm tracking-wide">
-                    {zone.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-400">
-                    Est. Crowd:{' '}
-                    <span className="font-semibold text-slate-200">
-                      {estOccupants.toLocaleString()}
-                    </span>{' '}
-                    / {zone.capacity.toLocaleString()}
-                  </p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xl font-extrabold tracking-tight">{level}%</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-                    {flowText.split(' / ')[0]}
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar Container */}
-              <div className="mt-4 h-2 w-full rounded-full bg-slate-950/40 overflow-hidden border border-slate-800">
-                <div
-                  className={`h-full rounded-full ${barBg} transition-all duration-1000 ease-in-out`}
-                  style={{ width: `${level}%` }}
-                />
-              </div>
-
-              <div className="mt-3 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Updated {zone.lastUpdated.toLocaleTimeString()}</span>
-                {level > 75 && (
-                  <span className="flex items-center gap-1 text-rose-400 font-bold animate-pulse">
-                    <AlertTriangle className="h-3.5 w-3.5" /> High Risk
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {zones.map((zone) => (
+          <ZoneCard key={zone.id} zone={zone} />
+        ))}
       </div>
     </section>
   );
