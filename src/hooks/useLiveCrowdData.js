@@ -143,7 +143,17 @@ export function useLiveCrowdData() {
         if (i === surgeZoneIndex) {
           nudge = Math.floor(Math.random() * 11) + 25; // +25 to +35 jump
         } else {
-          nudge = Math.floor(Math.random() * 21) - 8; // -8 to +12 nudge
+          // Dynamic simulator behavior based on crowd levels to maintain a realistic mix of zones
+          if (zone.crowdLevel > 70) {
+            // Mean-reversion above 70%: bias negative (-15 to +5)
+            nudge = Math.floor(Math.random() * 21) - 15;
+          } else if (zone.crowdLevel < 30) {
+            // Upward bias below 30%: bias positive (-8 to +12)
+            nudge = Math.floor(Math.random() * 21) - 8;
+          } else {
+            // Normal fluctuation: allow natural dispersing/dispersal (-10 to +10)
+            nudge = Math.floor(Math.random() * 21) - 10;
+          }
         }
 
         const newLevel = Math.max(0, Math.min(100, zone.crowdLevel + nudge));
