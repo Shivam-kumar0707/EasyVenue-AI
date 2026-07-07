@@ -59,7 +59,7 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
   };
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl shadow-slate-950/20">
+    <section className="rounded-2xl border border-slate-850 bg-slate-900/40 p-6 backdrop-blur-xl shadow-xl shadow-slate-950/20">
       <div className="mb-6 flex items-center gap-2">
         <Volume2 className="h-5 w-5 text-indigo-400" aria-hidden="true" />
         <h2 className="text-lg font-semibold text-slate-100">AI Announcement Drafter</h2>
@@ -107,7 +107,7 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-650 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition-all duration-200 hover:bg-indigo-500 hover:shadow-indigo-650/40 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-650 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition-all duration-200 hover:bg-indigo-500 hover:shadow-indigo-650/40 active:scale-[0.98] active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 cursor-pointer"
         >
           {isSubmitting ? (
             <>

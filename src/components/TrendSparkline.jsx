@@ -20,7 +20,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
 
   if (!history || history.length === 0) {
     return (
-      <div className="mt-3 pt-3 border-t border-slate-800/40 text-center text-[10px] text-slate-550 italic font-medium">
+      <div className="mt-4 pt-4 border-t border-slate-800/40 text-center text-[10px] text-slate-500 italic font-semibold">
         Gathering crowd trend history...
       </div>
     );
@@ -38,7 +38,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
     strokeColorClass = 'text-amber-400';
     tooltipValueClass = 'text-amber-400';
   } else if (currentLevel > 75) {
-    strokeColorClass = 'text-rose-400';
+    strokeColorClass = 'text-rose-450';
     tooltipValueClass = 'text-rose-450';
   }
 
@@ -56,11 +56,11 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
         });
 
   return (
-    <div className="relative mt-3 pt-3 border-t border-slate-800/60 flex flex-col items-center">
+    <div className="relative mt-4 pt-4 border-t border-slate-850/40 flex flex-col items-center">
       {/* Tooltip display */}
       {activePoint && (
         <div
-          className="absolute bottom-[48px] bg-slate-950/95 border border-slate-800 rounded px-2 py-1 text-[10px] text-slate-100 shadow-lg shadow-black/40 pointer-events-none whitespace-nowrap animate-fadeIn flex flex-col items-center z-10"
+          className="absolute bottom-[52px] bg-slate-950/95 border border-slate-800 rounded px-2.5 py-1 text-[10px] text-slate-100 shadow-xl shadow-black/60 pointer-events-none whitespace-nowrap animate-fadeIn flex flex-col items-center z-10"
           role="tooltip"
         >
           <span className={`font-bold ${tooltipValueClass}`}>{activePoint.crowdLevel}%</span>
@@ -93,8 +93,8 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
             x2="0"
             y2="1"
           >
-            <stop offset="0%" className="text-current opacity-20" />
-            <stop offset="100%" className="text-current opacity-0" />
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.0" />
           </linearGradient>
         </defs>
 
@@ -113,7 +113,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
             d={linePath}
             fill="none"
             className={`${strokeColorClass} stroke-current`}
-            strokeWidth="1.5"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -143,7 +143,7 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
         })}
       </svg>
 
-      <span className="mt-1.5 text-[8px] text-slate-500 font-bold tracking-widest uppercase">
+      <span className="mt-2 text-[8px] font-bold tracking-widest uppercase text-slate-500/80">
         30-Min Crowd Trend
       </span>
     </div>
