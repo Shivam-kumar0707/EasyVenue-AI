@@ -140,11 +140,19 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
             <div className="flex items-center gap-2">
               <span className="text-[9px] text-slate-500 flex items-center gap-1">
                 <Clock className="h-3 w-3" aria-hidden="true" />
-                {latestDraft.timestamp.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                })}
+                {(() => {
+                  const dateVal =
+                    latestDraft.timestamp instanceof Date
+                      ? latestDraft.timestamp
+                      : latestDraft.timestamp?.toDate
+                        ? latestDraft.timestamp.toDate()
+                        : new Date(latestDraft.timestamp);
+                  return dateVal.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  });
+                })()}
               </span>
 
               <button

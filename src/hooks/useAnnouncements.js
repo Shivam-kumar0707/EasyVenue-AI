@@ -68,14 +68,18 @@ export function useAnnouncements() {
     const announcementsCol = collection(db, 'announcements');
     const newDocRef = doc(announcementsCol); // Unique ID
 
+    const firestoreTimestamp = Timestamp.now();
     const record = {
       id: newDocRef.id,
       text: draftedText,
       situationInput,
-      timestamp: Timestamp.now(),
+      timestamp: firestoreTimestamp.toDate(),
     };
 
-    await setDoc(newDocRef, record);
+    await setDoc(newDocRef, {
+      ...record,
+      timestamp: firestoreTimestamp,
+    });
     return record;
   };
 
