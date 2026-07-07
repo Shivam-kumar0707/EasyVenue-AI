@@ -5,41 +5,34 @@ service cloud.firestore {
     
     // NOTE: These rules are intentionally permissive to allow public reads and writes for
     // a public hackathon/demo dashboard vertical (no authentication flow implemented).
-    // However, they strictly validate incoming document schemas to prevent database-bypass
-    // script injections or data overflow.
+    // They validate incoming document schemas on user-submitted collections (incidents, announcements)
+    // to prevent database-bypass script injections or data overflow.
     // In production, these rules must be locked down to authenticated organizer/staff roles.
 
     match /zones/{zoneId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
       
       match /history/{docId} {
-        allow read: if true;
-        // Validate simulation ticks values
-        allow create, update: if request.resource.data.crowdLevel is number
-                              && request.resource.data.crowdLevel >= 0
-                              && request.resource.data.crowdLevel <= 100;
-        allow delete: if true;
+        allow read, write: if true;
       }
     }
     
     match /incidents/{incidentId} {
       allow read: if true;
-      // Enforce incident categories, severities, status, and rawText size constraints
-      allow create, update: if request.resource.data.category in ['crowd_control', 'medical', 'security', 'facility', 'lost_person', 'unclassified']
-                           && request.resource.data.severity in ['low', 'medium', 'high']
-                           && request.resource.data.rawText is string
-                           && request.resource.data.rawText.size() <= 500
-                           && request.resource.data.status in ['open', 'acknowledged', 'resolved'];
+      // Enforce category, severity, status enums, and size limits (supporting both old seeded data and new AI categories)
+      allow create, update: if request.resource.data.category in ['crowd_control', 'medical', 'security', 'facility', 'lost_person', 'unclassified', 'Crowd Size', 'Medical', 'Safety', 'Infrastructure', 'Other']
+                           && request.resource.data.severity in ['low', 'medium', 'high', 'Low', 'Medium', 'High']
+                           && request.resource.data.status in ['open', 'acknowledged', 'resolved', 'Open', 'Acknowledged', 'Resolved']
+                           && (!('rawText' in request.resource.data) || (request.resource.data.rawText is string && request.resource.data.rawText.size() <= 500))
+                           && (!('description' in request.resource.data) || (request.resource.data.description is string && request.resource.data.description.size() <= 500));
       allow delete: if true;
     }
     
     match /announcements/{announcementId} {
       allow read: if true;
       // Enforce situation input size and text properties
-      allow create, update: if request.resource.data.situationInput is string
-                           && request.resource.data.situationInput.size() <= 300
-                           && request.resource.data.text is string;
+      allow create, update: if (!('situationInput' in request.resource.data) || (request.resource.data.situationInput is string && request.resource.data.situationInput.size() <= 300))
+                           && (!('text' in request.resource.data) || request.resource.data.text is string);
       allow delete: if true;
     }
     
