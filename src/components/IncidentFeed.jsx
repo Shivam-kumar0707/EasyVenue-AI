@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ShieldAlert, Inbox, CheckCircle2 } from 'lucide-react';
 import { IncidentCard } from './IncidentCard.jsx';
 
@@ -14,6 +14,29 @@ import { IncidentCard } from './IncidentCard.jsx';
  */
 export function IncidentFeed({ incidents, loading, onAcknowledge, onResolve }) {
   const [filter, setFilter] = useState('active'); // 'active' | 'resolved' | 'all'
+
+  // Filter criteria logic (memoized)
+  const filteredIncidents = useMemo(() => {
+    return incidents.filter((inc) => {
+      if (filter === 'active') return inc.status !== 'resolved';
+      if (filter === 'resolved') return inc.status === 'resolved';
+      return true;
+    });
+  }, [incidents, filter]);
+
+  // Count active and resolved incidents in a single memoized pass
+  const { activeCount, resolvedCount } = useMemo(() => {
+    let active = 0;
+    let resolved = 0;
+    incidents.forEach((inc) => {
+      if (inc.status === 'resolved') {
+        resolved++;
+      } else {
+        active++;
+      }
+    });
+    return { activeCount: active, resolvedCount: resolved };
+  }, [incidents]);
 
   if (loading) {
     return (
@@ -33,17 +56,6 @@ export function IncidentFeed({ incidents, loading, onAcknowledge, onResolve }) {
       </section>
     );
   }
-
-  // Filter criteria logic
-  const filteredIncidents = incidents.filter((inc) => {
-    if (filter === 'active') return inc.status !== 'resolved';
-    if (filter === 'resolved') return inc.status === 'resolved';
-    return true;
-  });
-
-  const activeCount = incidents.filter((i) => i.status !== 'resolved').length;
-  const resolvedCount = incidents.filter((i) => i.status === 'resolved').length;
-
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-xl shadow-xl shadow-slate-950/20">
       {/* Feed header controls */}

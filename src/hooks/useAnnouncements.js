@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   collection,
   onSnapshot,
@@ -63,7 +63,7 @@ export function useAnnouncements() {
    * @param {string} situationInput - Raw user input describing the event situation.
    * @returns {Promise<Object>} - The newly created announcement document fields.
    */
-  const createAnnouncement = async (situationInput) => {
+  const createAnnouncement = useCallback(async (situationInput) => {
     const draftedText = await draftAnnouncement(situationInput);
     const announcementsCol = collection(db, 'announcements');
     const newDocRef = doc(announcementsCol); // Unique ID
@@ -81,7 +81,7 @@ export function useAnnouncements() {
       timestamp: firestoreTimestamp,
     });
     return record;
-  };
+  }, []);
 
   return { announcements, loading, createAnnouncement };
 }

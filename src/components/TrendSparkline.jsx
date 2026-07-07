@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { generateSparklinePath } from '../utils/generateSparklinePath.js';
 import { getTrendDescription } from '../utils/trendDesc.js';
 
@@ -18,6 +18,31 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
   const width = 180;
   const height = 45;
 
+  // Convert points to SVG coordinates (memoized)
+  const { linePath, areaPath } = useMemo(() => {
+    return generateSparklinePath(history, width, height);
+  }, [history, width, height]);
+
+  // Verbal description for screen readers (memoized)
+  const trendAriaLabel = useMemo(() => {
+    return getTrendDescription(zoneName, history);
+  }, [zoneName, history]);
+
+  // Downsample the history to maximum 6 data points to prevent keyboard tab traps (memoized)
+  const interactivePoints = useMemo(() => {
+    const limit = 6;
+    if (!history || history.length === 0) return [];
+    return history.length <= limit
+      ? history.map((p, i) => ({ ...p, originalIndex: i }))
+      : Array.from({ length: limit }, (_, i) => {
+          const originalIndex = Math.round(i * ((history.length - 1) / (limit - 1)));
+          return {
+            ...history[originalIndex],
+            originalIndex,
+          };
+        });
+  }, [history]);
+
   if (!history || history.length === 0) {
     return (
       <div className="mt-4 pt-4 border-t border-slate-800/40 text-center text-[10px] text-slate-500 italic font-semibold">
@@ -25,10 +50,6 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
       </div>
     );
   }
-
-  // Convert points to SVG coordinates
-  const { linePath, areaPath } = generateSparklinePath(history, width, height);
-  const trendAriaLabel = getTrendDescription(zoneName, history);
 
   // Color theme mapping
   let strokeColorClass = 'text-emerald-400';
@@ -41,19 +62,6 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
     strokeColorClass = 'text-rose-450';
     tooltipValueClass = 'text-rose-450';
   }
-
-  // Downsample the history to maximum 6 data points to prevent keyboard tab traps
-  const limit = 6;
-  const interactivePoints =
-    history.length <= limit
-      ? history.map((p, i) => ({ ...p, originalIndex: i }))
-      : Array.from({ length: limit }, (_, i) => {
-          const originalIndex = Math.round(i * ((history.length - 1) / (limit - 1)));
-          return {
-            ...history[originalIndex],
-            originalIndex,
-          };
-        });
 
   return (
     <div className="relative mt-4 pt-4 border-t border-slate-850/40 flex flex-col items-center">

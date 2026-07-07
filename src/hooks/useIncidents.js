@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { collection, onSnapshot, doc, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 import { classifyIncident } from '../ai/classifyIncident.js';
@@ -63,7 +63,7 @@ export function useIncidents() {
    * @param {string} rawText - User's description of the incident.
    * @param {string} zone - The zone name where it occurred.
    */
-  const addIncident = async (rawText, zone) => {
+  const addIncident = useCallback(async (rawText, zone) => {
     const incidentsCol = collection(db, 'incidents');
     const newDocRef = doc(incidentsCol); // Generates a unique document reference
 
@@ -80,25 +80,25 @@ export function useIncidents() {
     };
 
     await setDoc(newDocRef, newIncident);
-  };
+  }, []);
 
   /**
    * Sets the status of an incident to "acknowledged".
    * @param {string} id - The document ID of the incident.
    */
-  const acknowledgeIncident = async (id) => {
+  const acknowledgeIncident = useCallback(async (id) => {
     const docRef = doc(db, 'incidents', id);
     await updateDoc(docRef, { status: 'acknowledged' });
-  };
+  }, []);
 
   /**
    * Sets the status of an incident to "resolved".
    * @param {string} id - The document ID of the incident.
    */
-  const resolveIncident = async (id) => {
+  const resolveIncident = useCallback(async (id) => {
     const docRef = doc(db, 'incidents', id);
     await updateDoc(docRef, { status: 'resolved' });
-  };
+  }, []);
 
   return {
     incidents,
