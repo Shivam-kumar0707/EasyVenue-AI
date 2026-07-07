@@ -7,6 +7,7 @@ import { FileText, Sparkles, CheckCircle2 } from 'lucide-react';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 import { summarizeActivity } from '../ai/summarizeActivity.js';
+import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 
 /**
  * SummaryPanel component lets organizers run an AI compilation of the last hour's events.
@@ -37,12 +38,7 @@ export function SummaryPanel({ incidents }) {
 
       querySnapshot.forEach((docSnap) => {
         const item = docSnap.data();
-        let reportedAtDate = new Date();
-        if (item.reportedAt) {
-          reportedAtDate = item.reportedAt.toDate
-            ? item.reportedAt.toDate()
-            : new Date(item.reportedAt);
-        }
+        const reportedAtDate = parseFirestoreDate(item.reportedAt);
         lastHourIncidents.push({
           id: docSnap.id,
           ...item,

@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { collection, onSnapshot, doc, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 import { classifyIncident } from '../ai/classifyIncident.js';
+import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 
 /**
  * Custom hook to manage Firestore incident subscription and mutation functions.
@@ -26,12 +27,7 @@ export function useIncidents() {
           const item = docSnap.data();
           const id = docSnap.id;
 
-          let reportedAtDate = new Date();
-          if (item.reportedAt) {
-            reportedAtDate = item.reportedAt.toDate
-              ? item.reportedAt.toDate()
-              : new Date(item.reportedAt);
-          }
+          const reportedAtDate = parseFirestoreDate(item.reportedAt);
 
           data.push({
             id,

@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
+import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 
 /**
  * Custom hook to listen to the history subcollection of a specific zone in Firestore.
@@ -34,11 +35,7 @@ export function useZoneHistory(zoneId) {
         const readings = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          let date = new Date();
-
-          if (data.timestamp) {
-            date = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
-          }
+          const date = parseFirestoreDate(data.timestamp);
 
           readings.push({
             crowdLevel: data.crowdLevel,

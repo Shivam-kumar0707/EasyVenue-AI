@@ -18,6 +18,7 @@ import {
 import { db } from '../firebase/config.js';
 import { detectAnomaly } from '../ai/detectAnomaly.js';
 import { checkAnomaly } from '../utils/checkAnomaly.js';
+import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 
 /**
  * Custom hook to manage live crowd levels and simulation.
@@ -55,12 +56,7 @@ export function useLiveCrowdData() {
           const data = docSnap.data();
           const zoneId = docSnap.id;
 
-          let lastUpdatedDate = new Date();
-          if (data.lastUpdated) {
-            lastUpdatedDate = data.lastUpdated.toDate
-              ? data.lastUpdated.toDate()
-              : new Date(data.lastUpdated);
-          }
+          const lastUpdatedDate = parseFirestoreDate(data.lastUpdated);
 
           const zone = {
             id: zoneId,
