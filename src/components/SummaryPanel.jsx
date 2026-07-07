@@ -16,7 +16,7 @@ import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
  * @param {Object} props
  * @param {Array} props.incidents - Full incident documents list (kept for signature compatibility).
  */
-export function SummaryPanel({ incidents }) {
+export function SummaryPanel({ incidents: _incidents }) {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
 
