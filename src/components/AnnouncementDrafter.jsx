@@ -2,7 +2,7 @@
  * @file AnnouncementDrafter.jsx
  * @description Component for organizers to draft PA scripts using GenAI and review announcement history.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, Copy, Check, AlertCircle, Sparkles, Clock, FileText } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';
 
@@ -23,6 +23,16 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
   const [latestDraft, setLatestDraft] = useState(null);
   const [copied, setCopied] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const cooldownIntervalRef = useRef(null);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (cooldownIntervalRef.current) {
+        clearInterval(cooldownIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Debounce character counter update to 300ms
   useEffect(() => {
@@ -55,10 +65,16 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
 
       // Trigger 5-second cooldown
       setCooldown(5);
-      const cooldownInterval = setInterval(() => {
+      if (cooldownIntervalRef.current) {
+        clearInterval(cooldownIntervalRef.current);
+      }
+      cooldownIntervalRef.current = setInterval(() => {
         setCooldown((prev) => {
           if (prev <= 1) {
-            clearInterval(cooldownInterval);
+            if (cooldownIntervalRef.current) {
+              clearInterval(cooldownIntervalRef.current);
+              cooldownIntervalRef.current = null;
+            }
             return 0;
           }
           return prev - 1;
