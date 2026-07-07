@@ -1,12 +1,12 @@
-# VenueOps AI
+# EasyVenue AI
 
 ## Chosen Vertical
 Organizer / Venue Staff
 
 ## Approach & Logic
-VenueOps AI is a single-screen real-time stadium operations dashboard designed specifically for venue staff, organizers, and emergency directors during major events (e.g. FIFA World Cup 2026). The central design principle is a **single shared live stadium state** stored in Firebase Firestore, serving as the single source of truth for both human operators and generative AI models.
+EasyVenue AI is a single-screen real-time stadium operations dashboard designed specifically for venue staff, organizers, and emergency directors during major events (e.g. FIFA World Cup 2026). The central design principle is a **single shared live stadium state** stored in Firebase Firestore, serving as the single source of truth for both human operators and generative AI models.
 
-Instead of running separate siloed workflows, every AI assistant capability in VenueOps AI reasons over this unified live state. For instance, when the simulation engine updates crowd levels, the live UI changes via Firestore snapshot listeners, the in-memory anomaly detector calculates spikes, and the hourly summarizer digests recent reports. This architecture ensures complete alignment across human staff, system rules, and GenAI models, preventing split-second communication gaps.
+Instead of running separate siloed workflows, every AI assistant capability in EasyVenue AI reasons over this unified live state. For instance, when the simulation engine updates crowd levels, the live UI changes via Firestore snapshot listeners, the in-memory anomaly detector calculates spikes, and the hourly summarizer digests recent reports. This architecture ensures complete alignment across human staff, system rules, and GenAI models, preventing split-second communication gaps.
 
 By utilising a low-latency, real-time database coupled with event-driven Groq SDK calls, the application minimizes unnecessary API utilization. Generative AI operations are only executed when genuine spikes occur, or when an operator explicitly requests an hourly overview. The dashboard UI presents all of this in a modern, dark-themed operations center aesthetic.
 
