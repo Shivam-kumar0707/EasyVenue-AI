@@ -89,8 +89,8 @@ export function IncidentCard({ incident, onAcknowledge, onResolve }) {
   const categoryInfo = categoryMap[incident.category] || categoryMap.unclassified;
   const severityInfo = severityMap[incident.severity] || severityMap.unclassified;
 
-  const CatIcon = categoryInfo.icon;
-  const SevIcon = severityInfo.icon;
+  const CategoryIcon = categoryInfo.icon;
+  const SeverityIcon = severityInfo.icon;
 
   const formattedTime = incident.reportedAt
     ? incident.reportedAt.toLocaleTimeString([], {
@@ -119,14 +119,14 @@ export function IncidentCard({ incident, onAcknowledge, onResolve }) {
           <div
             className={`flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryInfo.styles}`}
           >
-            <CatIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            <CategoryIcon className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{categoryInfo.label}</span>
           </div>
 
           <div
             className={`flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${severityInfo.styles}`}
           >
-            <SevIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            <SeverityIcon className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{severityInfo.label}</span>
           </div>
         </div>

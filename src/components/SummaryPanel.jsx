@@ -29,28 +29,28 @@ export function SummaryPanel({ incidents }) {
 
       // Fetch incidents reported in the last hour directly from Firestore
       const incidentsCol = collection(db, 'incidents');
-      const q = query(
+      const hourlyIncidentsQuery = query(
         incidentsCol,
         where('reportedAt', '>=', Timestamp.fromDate(oneHourAgo))
       );
-      const querySnapshot = await getDocs(q);
-      const lastHourIncidents = [];
+      const incidentsSnapshot = await getDocs(hourlyIncidentsQuery);
+      const recentIncidents = [];
 
-      querySnapshot.forEach((docSnap) => {
-        const item = docSnap.data();
-        const reportedAtDate = parseFirestoreDate(item.reportedAt);
-        lastHourIncidents.push({
+      incidentsSnapshot.forEach((docSnap) => {
+        const incidentFields = docSnap.data();
+        const reportedAtDate = parseFirestoreDate(incidentFields.reportedAt);
+        recentIncidents.push({
           id: docSnap.id,
-          ...item,
+          ...incidentFields,
           reportedAt: reportedAtDate,
         });
       });
 
-      if (lastHourIncidents.length === 0) {
+      if (recentIncidents.length === 0) {
         // Optimize API consumption: skip the Groq call and set static summary
         setSummary('No incidents in the last hour. Operations normal.');
       } else {
-        const result = await summarizeActivity(lastHourIncidents);
+        const result = await summarizeActivity(recentIncidents);
         setSummary(result);
       }
     } catch (error) {

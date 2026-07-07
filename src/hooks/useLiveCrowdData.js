@@ -48,22 +48,22 @@ export function useLiveCrowdData() {
     const unsubscribe = onSnapshot(
       zonesCol,
       (snapshot) => {
-        const zonesData = [];
+        const parsedZones = [];
         const now = Date.now();
         const tenMinutesAgo = now - 10 * 60 * 1000;
 
         snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
+          const zoneFields = docSnap.data();
           const zoneId = docSnap.id;
 
-          const lastUpdatedDate = parseFirestoreDate(data.lastUpdated);
+          const lastUpdatedDate = parseFirestoreDate(zoneFields.lastUpdated);
 
           const zone = {
             id: zoneId,
-            ...data,
+            ...zoneFields,
             lastUpdated: lastUpdatedDate,
           };
-          zonesData.push(zone);
+          parsedZones.push(zone);
 
           // Anomaly detection history updates
           if (!historyRef.current[zoneId]) {
@@ -78,7 +78,7 @@ export function useLiveCrowdData() {
 
           // Clean history older than 10 minutes
           historyRef.current[zoneId] = historyRef.current[zoneId].filter(
-            (item) => item.timestamp >= tenMinutesAgo
+            (historyRecord) => historyRecord.timestamp >= tenMinutesAgo
           );
 
           // Analyze for sudden surges (>30% jump from minimum level in window)
@@ -111,16 +111,16 @@ export function useLiveCrowdData() {
                     timestamp: new Date(),
                   });
                 })
-                .catch((err) => {
-                  console.error('Error generating anomaly recommendation:', err);
+                .catch((error) => {
+                  console.error('Error generating anomaly recommendation:', error);
                 });
             }
           }
         });
 
         // Ensure zones are sorted alphabetically by name
-        zonesData.sort((a, b) => a.name.localeCompare(b.name));
-        setZones(zonesData);
+        parsedZones.sort((a, b) => a.name.localeCompare(b.name));
+        setZones(parsedZones);
         setLoading(false);
       },
       (error) => {
@@ -133,13 +133,13 @@ export function useLiveCrowdData() {
 
   // 2. Simulation engine running every 6-8 seconds
   useEffect(() => {
-    let timeoutId;
+    let simulatorTimerId;
 
     const tick = async () => {
       const currentZones = zonesRef.current;
       if (currentZones.length === 0) {
         // If zones aren't loaded yet, check again in 2 seconds
-        timeoutId = setTimeout(tick, 2000);
+        simulatorTimerId = setTimeout(tick, 2000);
         return;
       }
 
@@ -147,76 +147,76 @@ export function useLiveCrowdData() {
       const isSurge = Math.random() < 0.1;
       const surgeZoneIndex = isSurge ? Math.floor(Math.random() * currentZones.length) : -1;
 
-      for (let i = 0; i < currentZones.length; i++) {
-        const zone = currentZones[i];
-        let nudge = 0;
+      for (let zoneIndex = 0; zoneIndex < currentZones.length; zoneIndex++) {
+        const currentZone = currentZones[zoneIndex];
+        let crowdChangeNudge = 0;
 
-        if (i === surgeZoneIndex) {
-          nudge = Math.floor(Math.random() * 11) + 25; // +25 to +35 jump
+        if (zoneIndex === surgeZoneIndex) {
+          crowdChangeNudge = Math.floor(Math.random() * 11) + 25; // +25 to +35 jump
         } else {
           // Dynamic simulator behavior based on crowd levels to maintain a realistic mix of zones
-          if (zone.crowdLevel > 70) {
+          if (currentZone.crowdLevel > 70) {
             // Mean-reversion above 70%: bias negative (-15 to +5)
-            nudge = Math.floor(Math.random() * 21) - 15;
-          } else if (zone.crowdLevel < 30) {
+            crowdChangeNudge = Math.floor(Math.random() * 21) - 15;
+          } else if (currentZone.crowdLevel < 30) {
             // Upward bias below 30%: bias positive (-8 to +12)
-            nudge = Math.floor(Math.random() * 21) - 8;
+            crowdChangeNudge = Math.floor(Math.random() * 21) - 8;
           } else {
             // Normal fluctuation: allow natural dispersing/dispersal (-10 to +10)
-            nudge = Math.floor(Math.random() * 21) - 10;
+            crowdChangeNudge = Math.floor(Math.random() * 21) - 10;
           }
         }
 
-        const newLevel = Math.max(0, Math.min(100, zone.crowdLevel + nudge));
+        const updatedCrowdLevel = Math.max(0, Math.min(100, currentZone.crowdLevel + crowdChangeNudge));
 
-        if (newLevel !== zone.crowdLevel) {
-          const zoneRef = doc(db, 'zones', zone.id);
+        if (updatedCrowdLevel !== currentZone.crowdLevel) {
+          const targetZoneRef = doc(db, 'zones', currentZone.id);
           try {
-            const timestampVal = Timestamp.now();
-            await updateDoc(zoneRef, {
-              crowdLevel: newLevel,
-              lastUpdated: timestampVal,
+            const currentTimestamp = Timestamp.now();
+            await updateDoc(targetZoneRef, {
+              crowdLevel: updatedCrowdLevel,
+              lastUpdated: currentTimestamp,
             });
 
             // Append to history subcollection: zones/{zoneId}/history/{timestamp}
-            const docId = String(timestampVal.toMillis());
-            const historyDocRef = doc(db, 'zones', zone.id, 'history', docId);
-            await setDoc(historyDocRef, {
-              crowdLevel: newLevel,
-              timestamp: timestampVal,
+            const historyDocumentId = String(currentTimestamp.toMillis());
+            const zoneHistoryDocRef = doc(db, 'zones', currentZone.id, 'history', historyDocumentId);
+            await setDoc(zoneHistoryDocRef, {
+              crowdLevel: updatedCrowdLevel,
+              timestamp: currentTimestamp,
             });
 
             // Trim history older than 30 minutes (Efficiency)
             const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-            const historyCol = collection(db, 'zones', zone.id, 'history');
-            const q = query(
+            const historyCol = collection(db, 'zones', currentZone.id, 'history');
+            const expiredHistoryQuery = query(
               historyCol,
               where('timestamp', '<', Timestamp.fromDate(thirtyMinutesAgo))
             );
-            const oldDocsSnapshot = await getDocs(q);
+            const expiredDocsSnapshot = await getDocs(expiredHistoryQuery);
 
-            if (!oldDocsSnapshot.empty) {
+            if (!expiredDocsSnapshot.empty) {
               const deleteBatch = writeBatch(db);
-              oldDocsSnapshot.forEach((oldDoc) => {
-                deleteBatch.delete(oldDoc.ref);
+              expiredDocsSnapshot.forEach((expiredDoc) => {
+                deleteBatch.delete(expiredDoc.ref);
               });
               await deleteBatch.commit();
             }
           } catch (error) {
-            console.error(`Failed to simulate update for ${zone.name}:`, error);
+            console.error(`Failed to simulate update for ${currentZone.name}:`, error);
           }
         }
       }
 
       // Schedule next tick with dynamic 6-8s interval
       const nextInterval = Math.floor(Math.random() * 2000) + 6000;
-      timeoutId = setTimeout(tick, nextInterval);
+      simulatorTimerId = setTimeout(tick, nextInterval);
     };
 
     const firstInterval = Math.floor(Math.random() * 2000) + 6000;
-    timeoutId = setTimeout(tick, firstInterval);
+    simulatorTimerId = setTimeout(tick, firstInterval);
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(simulatorTimerId);
   }, []);
 
   const dismissAlert = () => {

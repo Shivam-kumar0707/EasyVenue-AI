@@ -22,32 +22,32 @@ export function useIncidents() {
     const unsubscribe = onSnapshot(
       incidentsCol,
       (snapshot) => {
-        const data = [];
+        const parsedIncidents = [];
         snapshot.forEach((docSnap) => {
-          const item = docSnap.data();
-          const id = docSnap.id;
+          const incidentFields = docSnap.data();
+          const incidentId = docSnap.id;
 
-          const reportedAtDate = parseFirestoreDate(item.reportedAt);
+          const reportedAtDate = parseFirestoreDate(incidentFields.reportedAt);
 
-          data.push({
-            id,
-            ...item,
+          parsedIncidents.push({
+            id: incidentId,
+            ...incidentFields,
             reportedAt: reportedAtDate,
           });
         });
 
         // Sort by severity (high -> medium -> low -> unclassified) then recency (newest first)
         const severityRank = { high: 3, medium: 2, low: 1, unclassified: 0 };
-        data.sort((a, b) => {
-          const rankA = severityRank[a.severity] ?? 0;
-          const rankB = severityRank[b.severity] ?? 0;
-          if (rankA !== rankB) {
-            return rankB - rankA;
+        parsedIncidents.sort((a, b) => {
+          const severityRankA = severityRank[a.severity] ?? 0;
+          const severityRankB = severityRank[b.severity] ?? 0;
+          if (severityRankA !== severityRankB) {
+            return severityRankB - severityRankA;
           }
           return b.reportedAt.getTime() - a.reportedAt.getTime();
         });
 
-        setIncidents(data);
+        setIncidents(parsedIncidents);
         setLoading(false);
       },
       (error) => {

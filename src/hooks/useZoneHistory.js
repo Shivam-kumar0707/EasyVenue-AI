@@ -27,23 +27,23 @@ export function useZoneHistory(zoneId) {
 
     const historyCol = collection(db, 'zones', zoneId, 'history');
     // Order by timestamp ascending so that readings are chronological (oldest to newest)
-    const q = query(historyCol, orderBy('timestamp', 'asc'));
+    const historyQuery = query(historyCol, orderBy('timestamp', 'asc'));
 
     const unsubscribe = onSnapshot(
-      q,
+      historyQuery,
       (snapshot) => {
-        const readings = [];
+        const historicalReadings = [];
         snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const date = parseFirestoreDate(data.timestamp);
+          const historyFields = docSnap.data();
+          const parsedTimestamp = parseFirestoreDate(historyFields.timestamp);
 
-          readings.push({
-            crowdLevel: data.crowdLevel,
-            timestamp: date,
+          historicalReadings.push({
+            crowdLevel: historyFields.crowdLevel,
+            timestamp: parsedTimestamp,
           });
         });
 
-        setHistory(readings);
+        setHistory(historicalReadings);
         setLoading(false);
       },
       (error) => {
