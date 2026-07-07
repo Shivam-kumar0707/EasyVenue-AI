@@ -13,11 +13,20 @@ import { validateInput } from '../utils/validateInput.js';
  */
 export function ReportForm({ zones, onSubmitIncident }) {
   const [description, setDescription] = useState('');
+  const [charCount, setCharCount] = useState(0);
   const [selectedZone, setSelectedZone] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+
+  // Debounce character counter update to 300ms
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCharCount(description.length);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [description]);
 
   // Set default selected zone when list loads
   useEffect(() => {
@@ -118,9 +127,9 @@ export function ReportForm({ zones, onSubmitIncident }) {
               Raw Description
             </label>
             <span
-              className={`text-[10px] font-bold ${description.length > 500 ? 'text-rose-450' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${charCount > 500 ? 'text-rose-450' : 'text-slate-500'}`}
             >
-              {description.length} / 500 characters
+              {charCount} / 500 characters
             </span>
           </div>
           <textarea

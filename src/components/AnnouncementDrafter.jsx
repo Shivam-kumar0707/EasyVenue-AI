@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Volume2, Copy, Check, AlertCircle, Sparkles, Clock, FileText } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';
 
@@ -13,11 +13,20 @@ import { validateInput } from '../utils/validateInput.js';
  */
 export function AnnouncementDrafter({ announcements, loading, onCreateAnnouncement }) {
   const [situation, setSituation] = useState('');
+  const [charCount, setCharCount] = useState(0);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [latestDraft, setLatestDraft] = useState(null);
   const [copied, setCopied] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+
+  // Debounce character counter update to 300ms
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCharCount(situation.length);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [situation]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -97,10 +106,10 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
             </label>
             <span
               id="char-count-ann"
-              className={`text-[10px] font-bold ${situation.length > 300 ? 'text-rose-450' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${charCount > 300 ? 'text-rose-450' : 'text-slate-500'}`}
               aria-live="polite"
             >
-              {situation.length} / 300 characters
+              {charCount} / 300 characters
             </span>
           </div>
           <textarea
