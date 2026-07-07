@@ -11,6 +11,8 @@ import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
 /**
  * Custom hook to manage Firestore incident subscription and mutation functions.
  * Returns incidents sorted by severity (high -> medium -> low) then by recency.
+ *
+ * @returns {{ incidents: Array, loading: boolean, addIncident: Function, acknowledgeIncident: Function, resolveIncident: Function }}
  */
 export function useIncidents() {
   const [incidents, setIncidents] = useState([]);

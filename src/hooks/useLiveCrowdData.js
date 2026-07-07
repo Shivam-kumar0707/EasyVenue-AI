@@ -24,6 +24,8 @@ import { parseFirestoreDate } from '../utils/parseFirestoreDate.js';
  * Custom hook to manage live crowd levels and simulation.
  * Subscribes to Firestore zones and runs a simulation loop on mount.
  * Tracks zone history to detect >30% surges and trigger Groq anomaly recommendations.
+ *
+ * @returns {{ zones: Array, loading: boolean, activeAlert: Object|null, dismissAlert: Function }}
  */
 export function useLiveCrowdData() {
   const [zones, setZones] = useState([]);

@@ -8,6 +8,8 @@ import { db } from '../firebase/config.js';
 /**
  * Checks if the zones and incidents collections are empty.
  * If empty, seeds them with 5 realistic zones and 3 pre-existing incidents.
+ *
+ * @returns {Promise<void>}
  */
 export async function seedIfEmpty() {
   try {
