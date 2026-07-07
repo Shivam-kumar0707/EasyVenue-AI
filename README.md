@@ -45,3 +45,13 @@ Real IoT turnstiles, crowd-density CCTV feeds, and ticket scanners are not avail
 3. Copy `.env.example` to a new file named `.env` in the root folder, and fill in your actual credentials for `VITE_GROQ_API_KEY` and the Firebase config variables.
 4. Run `npm run dev` to start the local Vite development server.
 5. Run `npm test` to run the Vitest automated test suite.
+
+## Bundle Size & Dependency Audit (Section 4)
+- **Production Dependencies**: Firebase, Groq-SDK, Lucide-React, React, React-Dom (all confirmed in active use).
+- **Dev Dependencies Only**: TailwindCSS, ESLint, Oxlint, Prettier, Vite, Vitest. (Verified that no dev tools are in production dependencies).
+- **Exact Output Build Size**:
+  - `dist/index.html`: `0.44 kB`
+  - `dist/assets/index-O57AzRDQ.css`: `45.99 kB`
+  - `dist/assets/index-jM2ssO5m.js`: `753.37 kB`
+  - **Total Production Build Size**: `~799.8 kB`
+
