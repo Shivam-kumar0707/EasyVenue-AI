@@ -1,3 +1,7 @@
+/**
+ * @file useZoneHistory.js
+ * @description React hook subscribing to Firestore zones history subcollections for chart sparklines.
+ */
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/config.js';

@@ -1,3 +1,7 @@
+/**
+ * @file summarizeActivity.js
+ * @description AI agent utility to compile a 3-bullet activity summary of stadium incidents via the Groq API.
+ */
 import { getGroqChatCompletion } from './groqClient.js';
 
 /**

@@ -1,3 +1,7 @@
+/**
+ * @file IncidentCard.jsx
+ * @description Component to render detailed status cards for logged operations incidents.
+ */
 import React from 'react';
 import {
   Users,

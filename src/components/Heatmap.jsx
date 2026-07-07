@@ -1,3 +1,7 @@
+/**
+ * @file Heatmap.jsx
+ * @description Component rendering live stadium zone cards, capacities, and visual crowd levels.
+ */
 import React from 'react';
 import { Users, AlertTriangle } from 'lucide-react';
 import { useZoneHistory } from '../hooks/useZoneHistory.js';

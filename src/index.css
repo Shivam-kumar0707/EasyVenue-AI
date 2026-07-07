@@ -1,3 +1,7 @@
+/**
+ * @file index.css
+ * @description TailwindCSS base imports and global core dark mode overrides.
+ */
 @import 'tailwindcss';
 
 /* Any global overrides or custom CSS variables for our dashboard theme */

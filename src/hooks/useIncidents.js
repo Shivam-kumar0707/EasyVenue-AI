@@ -1,3 +1,7 @@
+/**
+ * @file useIncidents.js
+ * @description React hook managing live Firestore subscriptions for logged incidents and mutation callbacks.
+ */
 import { useEffect, useState, useCallback } from 'react';
 import { collection, onSnapshot, doc, setDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.js';

@@ -1,3 +1,7 @@
+/**
+ * @file draftAnnouncement.js
+ * @description AI agent utility to draft reassuring PA announcements based on operational events via the Groq API.
+ */
 import { getGroqChatCompletion } from './groqClient.js';
 
 /**

@@ -1,4 +1,8 @@
 /**
+ * @file checkAnomaly.js
+ * @description Utility to compute crowd level spikes and determine anomaly threshold breaches.
+ */
+/**
  * Analyzes crowd level history to determine if an anomaly (surge > 30%) has occurred.
  * @param {Array<number>} historyValues - Historical crowd levels in the window.
  * @param {number} currentValue - The latest crowd level value.

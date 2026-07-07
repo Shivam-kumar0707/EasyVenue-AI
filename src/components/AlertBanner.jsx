@@ -1,3 +1,7 @@
+/**
+ * @file AlertBanner.jsx
+ * @description Component to render high-urgency crowd anomaly banners and GenAI action recommendations.
+ */
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 

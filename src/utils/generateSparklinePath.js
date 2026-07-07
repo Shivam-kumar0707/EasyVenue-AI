@@ -1,4 +1,8 @@
 /**
+ * @file generateSparklinePath.js
+ * @description Utility projecting historical trend points into SVG coordinates and path strings.
+ */
+/**
  * Generates SVG line and area path strings for a given array of historical crowd levels.
  *
  * @param {Array<{crowdLevel: number}>} points - Chronological history points.

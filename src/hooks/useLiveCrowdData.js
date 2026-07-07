@@ -1,3 +1,7 @@
+/**
+ * @file useLiveCrowdData.js
+ * @description React hook managing the background simulator engine and live Firestore crowd level updates.
+ */
 import { useEffect, useState, useRef } from 'react';
 import {
   collection,

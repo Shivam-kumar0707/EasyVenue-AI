@@ -1,4 +1,8 @@
 /**
+ * @file trimHistory.js
+ * @description Utility to prune historical crowd readings older than 30 minutes.
+ */
+/**
  * Filters out history documents that are older than 30 minutes from a given array.
  *
  * @param {Array<{timestamp: Date|number}>} history - Array of history objects.

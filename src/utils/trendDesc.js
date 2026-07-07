@@ -1,4 +1,8 @@
 /**
+ * @file trendDesc.js
+ * @description Utility generating accessible screen-reader friendly verbal descriptions of crowd trends.
+ */
+/**
  * Generates a screen-reader friendly verbal description of a zone's crowd trend over the history period.
  *
  * @param {string} zoneName - Name of the zone (e.g. Gate 1).

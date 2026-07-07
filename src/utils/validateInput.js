@@ -1,4 +1,8 @@
 /**
+ * @file validateInput.js
+ * @description Utility to sanitize and validate raw text inputs to prevent XSS.
+ */
+/**
  * Safely sanitizes user text to prevent basic XSS by stripping HTML tags and escaping special characters.
  *
  * @param {string} text - The raw input text.

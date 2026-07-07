@@ -1,3 +1,7 @@
+/**
+ * @file useAnnouncements.js
+ * @description React hook managing live Firestore subscriptions for PA announcements and mutation callbacks.
+ */
 import { useEffect, useState, useCallback } from 'react';
 import {
   collection,

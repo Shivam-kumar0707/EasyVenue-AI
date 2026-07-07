@@ -1,3 +1,7 @@
+/**
+ * @file ReportForm.jsx
+ * @description Component for logging new operational incidents with live validation.
+ */
 import React, { useState, useEffect } from 'react';
 import { FileEdit, CheckCircle2, AlertCircle, Sparkles, Clock } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';

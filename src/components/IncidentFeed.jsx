@@ -1,3 +1,7 @@
+/**
+ * @file IncidentFeed.jsx
+ * @description Component displaying lists of logged incidents with status filter tabs.
+ */
 import React, { useState, useMemo } from 'react';
 import { ShieldAlert, Inbox, CheckCircle2 } from 'lucide-react';
 import { IncidentCard } from './IncidentCard.jsx';

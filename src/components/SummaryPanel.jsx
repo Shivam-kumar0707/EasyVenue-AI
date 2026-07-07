@@ -1,3 +1,7 @@
+/**
+ * @file SummaryPanel.jsx
+ * @description Component for organizers to compile and review 3-bullet activity summaries.
+ */
 import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2 } from 'lucide-react';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';

@@ -1,3 +1,7 @@
+/**
+ * @file config.js
+ * @description Configures and initializes the Firebase App and Firestore client database.
+ */
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 

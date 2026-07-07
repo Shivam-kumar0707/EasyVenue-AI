@@ -1,3 +1,7 @@
+/**
+ * @file classifyIncident.js
+ * @description AI agent utility to classify operations incidents via the Groq API.
+ */
 import { getGroqChatCompletion } from './groqClient.js';
 
 const classificationCache = new Map();

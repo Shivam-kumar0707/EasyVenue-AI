@@ -1,3 +1,7 @@
+/**
+ * @file seedDemoData.js
+ * @description Utility to populate initial demo zones and incidents collections in Firestore.
+ */
 import { collection, getDocs, writeBatch, doc, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.js';
 

@@ -1,3 +1,7 @@
+/**
+ * @file detectAnomaly.js
+ * @description AI agent utility to generate safety recommendations for crowd level anomalies via the Groq API.
+ */
 import { getGroqChatCompletion } from './groqClient.js';
 
 /**

@@ -1,3 +1,7 @@
+/**
+ * @file TrendSparkline.jsx
+ * @description Component rendering historical crowd level SVG charts and accessible tooltips.
+ */
 import React, { useState, useMemo } from 'react';
 import { generateSparklinePath } from '../utils/generateSparklinePath.js';
 import { getTrendDescription } from '../utils/trendDesc.js';

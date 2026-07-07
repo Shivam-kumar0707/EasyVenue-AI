@@ -1,3 +1,7 @@
+/**
+ * @file Dashboard.jsx
+ * @description Main dashboard page orchestrating layout, subscriptions, and seeding initial database state.
+ */
 import React, { useEffect } from 'react';
 import { Shield, Radio, Activity } from 'lucide-react';
 import { useLiveCrowdData } from '../hooks/useLiveCrowdData.js';

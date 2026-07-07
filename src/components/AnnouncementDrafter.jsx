@@ -1,3 +1,7 @@
+/**
+ * @file AnnouncementDrafter.jsx
+ * @description Component for organizers to draft PA scripts using GenAI and review announcement history.
+ */
 import React, { useState, useEffect } from 'react';
 import { Volume2, Copy, Check, AlertCircle, Sparkles, Clock, FileText } from 'lucide-react';
 import { validateInput } from '../utils/validateInput.js';

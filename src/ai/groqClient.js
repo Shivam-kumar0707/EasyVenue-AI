@@ -1,3 +1,7 @@
+/**
+ * @file groqClient.js
+ * @description Configures and instantiates the shared Groq API client instance.
+ */
 import { Groq } from 'groq-sdk';
 
 // This key is exposed client-side because this is a static frontend demo without a backend proxy. In production, this call should be routed through a backend/serverless function to keep the API key server-side and never exposed to the browser.
