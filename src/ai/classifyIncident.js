@@ -1,11 +1,28 @@
 import { getGroqChatCompletion } from './groqClient.js';
 
+const classificationCache = new Map();
+const CACHE_TTL_MS = 120000; // 2 minutes
+
+function normalizeText(text) {
+  return text ? text.trim().toLowerCase().replace(/\s+/g, ' ') : '';
+}
+
 /**
  * Classifies raw incident text into category, severity, and summary using Groq.
  * @param {string} rawText - Raw text describing the incident.
  * @returns {Promise<{category: string, severity: string, summary: string}>}
  */
 export async function classifyIncident(rawText) {
+  const normalized = normalizeText(rawText);
+  const now = Date.now();
+
+  if (classificationCache.has(normalized)) {
+    const entry = classificationCache.get(normalized);
+    if (now - entry.timestamp < CACHE_TTL_MS) {
+      return entry.result;
+    }
+  }
+
   const systemPrompt = `You are a stadium operations incident classifier for "EasyVenue AI".
 Analyze the raw text description of an incident and classify it.
 You MUST return a JSON object with exactly the following keys:
@@ -44,13 +61,18 @@ Rules:
         ? parsed.summary.trim()
         : 'Needs manual review';
 
-    return { category, severity, summary };
+    const result = { category, severity, summary };
+    classificationCache.set(normalized, { result, timestamp: now });
+    return result;
   } catch {
     console.error('Failed to classify incident, applying fallback.');
-    return {
+    const fallbackResult = {
       category: 'unclassified',
       severity: 'medium',
       summary: 'Needs manual review',
     };
+    // Cache fallback as well to prevent repetitive API hammering during downtime
+    classificationCache.set(normalized, { result: fallbackResult, timestamp: now });
+    return fallbackResult;
   }
 }

@@ -90,7 +90,7 @@ export function useLiveCrowdData() {
 
           if (isAnomaly) {
             const lastAlertTime = lastAlertedRef.current[zoneId] || 0;
-            const cooldown = 45 * 1000; // 45 seconds cooldown per zone
+            const cooldown = 5 * 60 * 1000; // 5 minutes cooldown per zone
 
             if (now - lastAlertTime > cooldown) {
               lastAlertedRef.current[zoneId] = now;
