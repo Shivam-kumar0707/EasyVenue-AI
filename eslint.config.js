@@ -1,12 +1,20 @@
 import js from '@eslint/js';
 
 export default [
+  {
+    ignores: ['node_modules/**', 'dist/**', 'build/**'],
+  },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: {
         // Browser globals
         window: 'readonly',
@@ -18,6 +26,7 @@ export default [
         clearInterval: 'readonly',
         requestAnimationFrame: 'readonly',
         cancelAnimationFrame: 'readonly',
+        navigator: 'readonly',
 
         // Node / build process globals
         process: 'readonly',
@@ -40,7 +49,7 @@ export default [
       },
     },
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^React$' }],
       'no-undef': 'error',
       'no-console': 'off',
     },

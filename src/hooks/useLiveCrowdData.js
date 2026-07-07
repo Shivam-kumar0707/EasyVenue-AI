@@ -165,7 +165,7 @@ export function useLiveCrowdData() {
 
       for (let zoneIndex = 0; zoneIndex < currentZones.length; zoneIndex++) {
         const currentZone = currentZones[zoneIndex];
-        let crowdChangeNudge = 0;
+        let crowdChangeNudge;
 
         if (zoneIndex === surgeZoneIndex) {
           crowdChangeNudge = Math.floor(Math.random() * 11) + 25; // +25 to +35 jump

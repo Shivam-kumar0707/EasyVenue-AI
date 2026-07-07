@@ -20,9 +20,9 @@ export const ZoneCard = React.memo(
     const { history } = useZoneHistory(zone.id);
 
     const level = zone.crowdLevel;
-    let themeClasses = '';
-    let barBg = '';
-    let flowText = '';
+    let themeClasses;
+    let barBg;
+    let flowText;
 
     if (level < 50) {
       themeClasses =
