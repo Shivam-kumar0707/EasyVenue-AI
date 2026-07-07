@@ -131,7 +131,7 @@ export function ReportForm({ zones, onSubmitIncident }) {
               Raw Description
             </label>
             <span
-              className={`text-[10px] font-bold ${charCount > 500 ? 'text-rose-450' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${charCount > 500 ? 'text-rose-500' : 'text-slate-500'}`}
             >
               {charCount} / 500 characters
             </span>
@@ -150,7 +150,7 @@ export function ReportForm({ zones, onSubmitIncident }) {
 
         {/* Error message Alert */}
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-xs font-semibold text-rose-450">
+          <div className="flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-xs font-semibold text-rose-500">
             <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{error}</span>
           </div>

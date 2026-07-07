@@ -105,7 +105,7 @@ export function SummaryPanel({ incidents: _incidents }) {
         ) : summary ? (
           <div>
             {bulletPoints.length === 1 && bulletPoints[0].includes('No incidents') ? (
-              <div className="flex items-center gap-2.5 text-sm text-emerald-450 font-semibold py-2">
+              <div className="flex items-center gap-2.5 text-sm text-emerald-500 font-semibold py-2">
                 <CheckCircle2
                   className="h-5 w-5 text-emerald-500 flex-shrink-0"
                   aria-hidden="true"

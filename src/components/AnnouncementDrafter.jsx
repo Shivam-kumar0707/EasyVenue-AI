@@ -110,7 +110,7 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
             </label>
             <span
               id="char-count-ann"
-              className={`text-[10px] font-bold ${charCount > 300 ? 'text-rose-450' : 'text-slate-500'}`}
+              className={`text-[10px] font-bold ${charCount > 300 ? 'text-rose-500' : 'text-slate-500'}`}
               aria-live="polite"
             >
               {charCount} / 300 characters
@@ -131,7 +131,7 @@ export function AnnouncementDrafter({ announcements, loading, onCreateAnnounceme
 
         {/* Error message Alert */}
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-xs font-semibold text-rose-450 animate-fadeIn">
+          <div className="flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/5 px-4 py-2.5 text-xs font-semibold text-rose-500 animate-fadeIn">
             <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{error}</span>
           </div>

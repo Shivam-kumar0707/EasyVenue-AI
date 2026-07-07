@@ -63,8 +63,8 @@ export function TrendSparkline({ zoneName, history, currentLevel }) {
     strokeColorClass = 'text-amber-400';
     tooltipValueClass = 'text-amber-400';
   } else if (currentLevel > 75) {
-    strokeColorClass = 'text-rose-450';
-    tooltipValueClass = 'text-rose-450';
+    strokeColorClass = 'text-rose-500';
+    tooltipValueClass = 'text-rose-500';
   }
 
   return (

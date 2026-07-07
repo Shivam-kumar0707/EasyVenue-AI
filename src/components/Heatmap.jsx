@@ -33,7 +33,7 @@ const ZoneCard = React.memo(
       barBg = 'bg-gradient-to-r from-amber-600 to-amber-400';
       flowText = 'Moderate / Heavy Flow';
     } else {
-      themeClasses = 'border-rose-500/15 bg-rose-950/15 text-rose-450 hover:border-rose-500/30';
+      themeClasses = 'border-rose-500/15 bg-rose-950/15 text-rose-500 hover:border-rose-500/30';
       barBg = 'bg-gradient-to-r from-rose-600 to-rose-400';
       flowText = 'Critical / Surge Risk';
     }
