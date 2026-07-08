@@ -3,6 +3,7 @@
  * @description AI agent utility to draft reassuring PA announcements based on operational events via the Groq API.
  */
 import { getGroqChatCompletion } from './groqClient.js';
+import { withAiFallback } from './aiHelpers.js';
 
 const announcementCache = new Map();
 const CACHE_TTL_MS = 120000; // 2 minutes
@@ -42,21 +43,22 @@ Rules:
 3. Suitable to be read aloud verbatim over a PA speaker.
 4. Output ONLY the announcement itself. Do not wrap in quotes or add intro/outro greetings.`;
 
-  try {
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Situation details: "${situation}"` },
-    ];
+  const result = await withAiFallback(
+    async () => {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Situation details: "${situation}"` },
+      ];
 
-    const response = await getGroqChatCompletion(messages);
-    const cleaned = response.trim().replace(/^["']|["']$/g, '');
+      const response = await getGroqChatCompletion(messages);
+      const cleaned = response.trim().replace(/^["']|["']$/g, '');
 
-    const result = cleaned || FALLBACK_ANNOUNCEMENT;
-    announcementCache.set(normalized, { result, timestamp: now });
-    return result;
-  } catch {
-    console.error('Failed to draft announcement, applying fallback.');
-    announcementCache.set(normalized, { result: FALLBACK_ANNOUNCEMENT, timestamp: now });
-    return FALLBACK_ANNOUNCEMENT;
-  }
+      return cleaned || FALLBACK_ANNOUNCEMENT;
+    },
+    FALLBACK_ANNOUNCEMENT,
+    'Failed to draft announcement, applying fallback.'
+  );
+
+  announcementCache.set(normalized, { result, timestamp: now });
+  return result;
 }

@@ -3,6 +3,7 @@
  * @description AI agent utility to compile a 3-bullet activity summary of stadium incidents via the Groq API.
  */
 import { getGroqChatCompletion } from './groqClient.js';
+import { withAiFallback } from './aiHelpers.js';
 
 /**
  * Summarizes stadium operations incidents from the last hour into exactly 3 bullet points.
@@ -31,26 +32,29 @@ Rules:
 3. Be professional, direct, and outline operational status.
 4. Output only the 3 bullet points. Do not include markdown headers, introductions, or greetings.`;
 
-  try {
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      {
-        role: 'user',
-        content: `Here is the list of incidents from the last hour:\n${incidentSummaryLines}`,
-      },
-    ];
+  const result = await withAiFallback(
+    async () => {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        {
+          role: 'user',
+          content: `Here is the list of incidents from the last hour:\n${incidentSummaryLines}`,
+        },
+      ];
 
-    const response = await getGroqChatCompletion(messages);
-    const cleaned = response.trim();
+      const response = await getGroqChatCompletion(messages);
+      const cleaned = response.trim();
 
-    // Check if we got something back
-    if (!cleaned) {
-      throw new Error('Empty summary response received');
-    }
+      // Check if we got something back
+      if (!cleaned) {
+        throw new Error('Empty summary response received');
+      }
 
-    return cleaned;
-  } catch {
-    console.error('Failed to summarize stadium activity, applying fallback.');
-    return `- Operations team actively responding to ${incidents.length} logged incidents.\n- Security and facility staff deployed to zones with open issues.\n- Crowd dynamics and gate operations remain under close monitoring.`;
-  }
+      return cleaned;
+    },
+    `- Operations team actively responding to ${incidents.length} logged incidents.\n- Security and facility staff deployed to zones with open issues.\n- Crowd dynamics and gate operations remain under close monitoring.`,
+    'Failed to summarize stadium activity, applying fallback.'
+  );
+
+  return result;
 }

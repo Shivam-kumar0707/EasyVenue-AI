@@ -3,6 +3,7 @@
  * @description AI agent utility to generate safety recommendations for crowd level anomalies via the Groq API.
  */
 import { getGroqChatCompletion } from './groqClient.js';
+import { withAiFallback } from './aiHelpers.js';
 
 const anomalyCache = new Map();
 const CACHE_TTL_MS = 120000; // 2 minutes
@@ -40,30 +41,31 @@ Rules:
 2. Must be actionable (e.g., "Deploy additional stewards to Gate 1 immediately" or "Open secondary exit doors to ease flow").
 3. Do not use quotes or prefix text. Output only the recommendation.`;
 
-  try {
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      {
-        role: 'user',
-        content: `Analyze surge from ${beforeValue}% to ${afterValue}% at ${zoneName}.`,
-      },
-    ];
+  const result = await withAiFallback(
+    async () => {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        {
+          role: 'user',
+          content: `Analyze surge from ${beforeValue}% to ${afterValue}% at ${zoneName}.`,
+        },
+      ];
 
-    const recommendation = await getGroqChatCompletion(messages);
-    let cleaned = recommendation.trim().replace(/^["']|["']$/g, ''); // Remove outer quotes if returned
+      const recommendation = await getGroqChatCompletion(messages);
+      let cleaned = recommendation.trim().replace(/^["']|["']$/g, ''); // Remove outer quotes if returned
 
-    // Check word count and ensure strict compliance
-    const words = cleaned.split(/\s+/);
-    if (words.length > 15) {
-      cleaned = words.slice(0, 15).join(' ');
-    }
+      // Check word count and ensure strict compliance
+      const words = cleaned.split(/\s+/);
+      if (words.length > 15) {
+        cleaned = words.slice(0, 15).join(' ');
+      }
 
-    const result = cleaned || FALLBACK_RECOMMENDATION;
-    anomalyCache.set(cacheKey, { result, timestamp: now });
-    return result;
-  } catch {
-    console.error('Failed to get anomaly recommendation, applying fallback.');
-    anomalyCache.set(cacheKey, { result: FALLBACK_RECOMMENDATION, timestamp: now });
-    return FALLBACK_RECOMMENDATION;
-  }
+      return cleaned || FALLBACK_RECOMMENDATION;
+    },
+    FALLBACK_RECOMMENDATION,
+    'Failed to get anomaly recommendation, applying fallback.'
+  );
+
+  anomalyCache.set(cacheKey, { result, timestamp: now });
+  return result;
 }

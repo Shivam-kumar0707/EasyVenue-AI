@@ -3,6 +3,7 @@
  * @description AI agent utility to classify operations incidents via the Groq API.
  */
 import { getGroqChatCompletion } from './groqClient.js';
+import { withAiFallback } from './aiHelpers.js';
 
 const classificationCache = new Map();
 const CACHE_TTL_MS = 120000; // 2 minutes
@@ -45,42 +46,41 @@ Rules:
 2. "severity" must match one of the 3 options exactly.
 3. Return ONLY the raw JSON object. Do not include markdown code blocks or conversational text.`;
 
-  try {
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Incident raw text: "${rawText}"` },
-    ];
+  const result = await withAiFallback(
+    async () => {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Incident raw text: "${rawText}"` },
+      ];
 
-    // Request json_object from Groq API to ensure strict JSON output.
-    const responseText = await getGroqChatCompletion(messages, {
-      response_format: { type: 'json_object' },
-    });
+      // Request json_object from Groq API to ensure strict JSON output.
+      const responseText = await getGroqChatCompletion(messages, {
+        response_format: { type: 'json_object' },
+      });
 
-    const parsed = JSON.parse(responseText.trim());
+      const parsed = JSON.parse(responseText.trim());
 
-    // Defensively check keys and validate values
-    const categories = ['crowd_control', 'medical', 'security', 'facility', 'lost_person'];
-    const severities = ['low', 'medium', 'high'];
+      // Defensively check keys and validate values
+      const categories = ['crowd_control', 'medical', 'security', 'facility', 'lost_person'];
+      const severities = ['low', 'medium', 'high'];
 
-    const category = categories.includes(parsed.category) ? parsed.category : 'unclassified';
-    const severity = severities.includes(parsed.severity) ? parsed.severity : 'medium';
-    const summary =
-      typeof parsed.summary === 'string' && parsed.summary.trim().length > 0
-        ? parsed.summary.trim()
-        : 'Needs manual review';
+      const category = categories.includes(parsed.category) ? parsed.category : 'unclassified';
+      const severity = severities.includes(parsed.severity) ? parsed.severity : 'medium';
+      const summary =
+        typeof parsed.summary === 'string' && parsed.summary.trim().length > 0
+          ? parsed.summary.trim()
+          : 'Needs manual review';
 
-    const result = { category, severity, summary };
-    classificationCache.set(normalized, { result, timestamp: now });
-    return result;
-  } catch {
-    console.error('Failed to classify incident, applying fallback.');
-    const fallbackResult = {
+      return { category, severity, summary };
+    },
+    {
       category: 'unclassified',
       severity: 'medium',
       summary: 'Needs manual review',
-    };
-    // Cache fallback as well to prevent repetitive API hammering during downtime
-    classificationCache.set(normalized, { result: fallbackResult, timestamp: now });
-    return fallbackResult;
-  }
+    },
+    'Failed to classify incident, applying fallback.'
+  );
+
+  classificationCache.set(normalized, { result, timestamp: now });
+  return result;
 }
