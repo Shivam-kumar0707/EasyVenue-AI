@@ -36,7 +36,13 @@ By utilising a low-latency, real-time database coupled with event-driven Groq SD
 
 ## Evaluation Criteria Coverage
 
-- **Code Quality**: Structured into small, single-purpose React hooks (`useLiveCrowdData.js`, `useIncidents.js`, `useZoneHistory.js`, `useAnnouncements.js`) and AI functions. Consistent formatting is enforced with Prettier and ESLint, and zero linter errors were reported by oxlint.
+- **Code Quality**: Structured with clean architecture:
+  - **Separated Concerns**: Simulator logic is decoupled from reading logic; `useLiveCrowdData.js` handles data reads and subscriptions, while `useCrowdSimulator.js` manages write simulation intervals.
+  - **Extracted Configurations**: Styling and icon mappings are isolated into `incidentConfig.js` from the UI layer.
+  - **Component Isolation**: Components like `ZoneCard.jsx` are isolated in separate files to keep layouts clean and modular.
+  - **Hook-Encapsulated Logic**: Filtering and data processing are moved out of UI rendering components; e.g., filtering logic for SummaryPanel is encapsulated inside `useRecentIncidents.js`.
+  - **Consolidated AI Wrappers**: Reusable helper `withAiFallback` handles generic try/catch error patterns for all Groq calls (`classifyIncident.js`, `detectAnomaly.js`, `summarizeActivity.js`, `draftAnnouncement.js`) in `aiHelpers.js`.
+  - Enforced consistent formatting with Prettier, ESLint, and zero linter errors reported by oxlint.
 - **Security**:
   - **Firestore Security Rules**: Configured inside [firestore.rules](file:///d:/Prompt%20Wars%20Challenge%20-%204/firestore.rules) to check incoming document structures. Enforces category enums, severity levels, input lengths, and data types (blocking database bypass attempts).
   - **XSS Prevention & Sanitization**: Free-text inputs are sanitized in [validateInput.js](file:///d:/Prompt%20Wars%20Challenge%20-%204/src/utils/validateInput.js) (stripping HTML tags, escaping special characters, and rejecting suspicious script tags/inline event handlers) to prevent cross-site scripting.
