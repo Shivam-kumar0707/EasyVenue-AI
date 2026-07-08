@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { FileText, Sparkles, CheckCircle2 } from 'lucide-react';
 import { summarizeActivity } from '../ai/summarizeActivity.js';
+import { useRecentIncidents } from '../hooks/useRecentIncidents.js';
 
 /**
  * SummaryPanel component lets organizers run an AI compilation of the last hour's events.
@@ -16,22 +17,13 @@ import { summarizeActivity } from '../ai/summarizeActivity.js';
 export function SummaryPanel({ incidents }) {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
+  const recentIncidents = useRecentIncidents(incidents);
 
   const handleSummarize = async () => {
     setLoading(true);
     setSummary('');
 
     try {
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-
-      // Filter recent incidents in-memory from props
-      const recentIncidents = (incidents || []).filter((inc) => {
-        if (!inc.reportedAt) return false;
-        const reportedTime =
-          inc.reportedAt instanceof Date ? inc.reportedAt : new Date(inc.reportedAt);
-        return reportedTime.getTime() >= oneHourAgo.getTime();
-      });
-
       if (recentIncidents.length === 0) {
         // Optimize API consumption: skip the Groq call and set static summary
         setSummary('No incidents in the last hour. Operations normal.');
