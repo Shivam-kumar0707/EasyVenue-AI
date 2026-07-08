@@ -5,6 +5,7 @@
 import React, { useEffect } from 'react';
 import { Shield, Radio, Activity } from 'lucide-react';
 import { useLiveCrowdData } from '../hooks/useLiveCrowdData.js';
+import { useCrowdSimulator } from '../hooks/useCrowdSimulator.js';
 import { useIncidents } from '../hooks/useIncidents.js';
 import { seedIfEmpty } from '../utils/seedDemoData.js';
 import { AlertBanner } from '../components/AlertBanner.jsx';
@@ -27,6 +28,7 @@ export function Dashboard() {
 
   // 2. Fetch live data streams from hooks
   const { zones, loading: zonesLoading, activeAlert, dismissAlert } = useLiveCrowdData();
+  useCrowdSimulator(zones);
   const {
     incidents,
     loading: incidentsLoading,
